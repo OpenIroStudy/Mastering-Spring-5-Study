@@ -1,4 +1,4 @@
-# 동진 
+# 동진 참고하시게
 
 ![image](https://user-images.githubusercontent.com/67637716/154502123-bb8ddb98-2f22-41f4-af61-587c0e7a98d2.png)
 ![image](https://user-images.githubusercontent.com/67637716/154502169-e567181b-a9c2-4cb9-8779-f66cd4e52fc0.png)
