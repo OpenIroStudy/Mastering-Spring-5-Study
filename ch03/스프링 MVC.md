@@ -16,7 +16,7 @@ Srping MVC
 * 아키텍처 스타일의 일부 애플리케이션에서는 JSP가 데이터베이스의 쿼리를 수행한다.
 * JSP는 다음에 표시할 페이지인 플로우 로직을 처리한다.
 
-<img src="https://user-images.githubusercontent.com/82895809/154843215-9d7bfb25-c8c3-479b-9e62-524a77709426.png" width="300px" height="500px"></img>
+<img src="https://user-images.githubusercontent.com/82895809/154843215-9d7bfb25-c8c3-479b-9e62-524a77709426.png" width="500px" height="500px"></img>
 * 접근법에 단점이 많아서 다른 아키텍처로의 진화가 시작됐다.
     * 어려운 관점 분리 : JSP는 다른 데이터를 검색하고 데이터를 표시한다. 다음에 표시할 페이지(플로우)를 결정하고 때로는 비즈니스 로직까지 책임졌다.
     * 복잡한 JSP : JSP가 많은 로직을 처리했기 때문에 거대해지고 유지 관리하기가 어려웠다.
