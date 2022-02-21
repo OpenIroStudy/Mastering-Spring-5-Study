@@ -37,7 +37,7 @@ Srping MVC
 여러 비즈니스 시나리오에서 요청을 처리하기 전에 서블릿에서 몇 가지 일반적인 작업을 수행하려고 한다.
 모델2 프론트 컨트롤러 아키텍처에서는 모든 요청이 프론트 컨트롤러라는 단일 컨트롤러로 전달된다.
 
-<img src="https://user-images.githubusercontent.com/82895809/154873339-fd9e65b7-38eb-4f38-be41-d8cb94b74b5b.png" width="2000px" height="500px"></img>
+<img src="https://user-images.githubusercontent.com/82895809/154873339-fd9e65b7-38eb-4f38-be41-d8cb94b74b5b.png" width="200px" height="500px"></img>
 
 * 어떤 컨트롤러가 요청을 실행할지 결정한다.
 * 렌더링할 뷰를 결정한다.
