@@ -1,4 +1,4 @@
-# MVC(Model-View-Controller) 패턴의 개념
+### MVC(Model-View-Controller) 패턴의 개념
 소프트웨어 공학에서 사용되는 아키텍처 패턴으로 MVC패턴의 주 목적은 **Business Logic과 Presentation Logic을 분리**하기 위함이다.
 
 Srping MVC
