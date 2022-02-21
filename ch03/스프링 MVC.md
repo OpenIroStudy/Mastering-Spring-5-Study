@@ -16,7 +16,7 @@ Srping MVC
 * 아키텍처 스타일의 일부 애플리케이션에서는 JSP가 데이터베이스의 쿼리를 수행한다.
 * JSP는 다음에 표시할 페이지인 플로우 로직을 처리한다.
 
-![모델1](https://user-images.githubusercontent.com/82895809/154843215-9d7bfb25-c8c3-479b-9e62-524a77709426.png)
+<img src="https://user-images.githubusercontent.com/82895809/154843215-9d7bfb25-c8c3-479b-9e62-524a77709426.png" width="300px" height="500px"></img>
 * 접근법에 단점이 많아서 다른 아키텍처로의 진화가 시작됐다.
     * 어려운 관점 분리 : JSP는 다른 데이터를 검색하고 데이터를 표시한다. 다음에 표시할 페이지(플로우)를 결정하고 때로는 비즈니스 로직까지 책임졌다.
     * 복잡한 JSP : JSP가 많은 로직을 처리했기 때문에 거대해지고 유지 관리하기가 어려웠다.
@@ -24,8 +24,7 @@ Srping MVC
 ## 모델2 아키텍처
 모델2 아키텍처는 여러 책임이 있은 복잡한 JSP와 관련된 복잡성을 해결하기 위해 도입됐다. 이것은 MVC 아키텍처 스타일의 기반을 형성한다.
 
-   ![모델2](https://user-images.githubusercontent.com/82895809/154870730-9cdc8c51-1083-4840-9442-7bbfd9357a81.png)
-<img src="https://user-images.githubusercontent.com/82895809/154870730-9cdc8c51-1083-4840-9442-7bbfd9357a81.png" width="300px" height="300px"></img>
+<img src="https://user-images.githubusercontent.com/82895809/154870730-9cdc8c51-1083-4840-9442-7bbfd9357a81.png" width="300px" height="500px"></img>
 모델2 아키텍처는 모델, 뷰와 컨트롤러 간의 역할을 명확하게 구분해 유지 관리가 좀 더 쉬운 애플리케이션이 만들어진다.
 * 모델 : 뷰를 생성하는 데 사용할 데이터를 나타낸다.
 * 뷰 : 모델을 사용해 화면을 렌더링한다.
