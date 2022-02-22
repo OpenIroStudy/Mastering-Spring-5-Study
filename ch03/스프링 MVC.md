@@ -114,8 +114,7 @@ public class BasicModleMapController {
 ``` jsp
 Welcome ${name}! This is coming from a model-map - a JSP
 ```
-![modelmap](https://user-images.githubusercontent.com/82895809/155109993-1ebbc75d-7d7d-4259-b420-9459624267d7.png)
-
+![modelmap](https://user-images.githubusercontent.com/82895809/155110365-831dd4ad-963d-49cd-9e5e-2028c852a5eb.png)
 
 ${name)은 EL(Expression Language)구문을 사용해 모델의 속성에 액세스한다.
 
@@ -143,5 +142,54 @@ public class BasicModelViewController {
 ``` jsp
 Welcome ${name}! This is coming from a model-view - a JSP
 ```
-![modelandview](https://user-images.githubusercontent.com/82895809/155110129-ed3a3bd5-4e39-443e-8522-039a1e8ce1f1.png)
+![modelandview](https://user-images.githubusercontent.com/82895809/155110404-6fd710f5-150b-4228-b86f-8b4ef607c97f.png)
 
+### 플로우5 : 폼이 있는 뷰로 전환하는 컨트롤러
+사용자의 입력을 캡처하기 위한 간단한 폼
+
+**User클래스 생성**
+```java
+public class User {
+   private ...
+   ...
+   //toString
+}
+```
+
+**폼을 표시하는 컨트롤러 메소드**
+```java
+@RequestMapping(value = "/create-user", method = RequestMethod.GET)
+public String showCreateUserPage(ModelMap model) {
+   model.addAttribute("user", new User());
+   return "user";
+}
+```
+* model.addAttribute("user", new User()) : 빈 폼 백업 객체로 모델을 설정할 때 사용.
+
+**폼으로 뷰 만들기**
+JSP는 스프링 프레임워크에서 지원하는 뷰 기술 중 하나다. 스프링 프레임워크를 사용하면 태그 라이브러리를 제공해 JSP로 뷰를 쉽게 만들 수 있다.
+```java
+<%@ taglib prefix="접두사" uri="URI" %>
+```
+![taglib](https://user-images.githubusercontent.com/82895809/155114116-62acf594-c563-4ff6-897a-28b04323e93c.png)
+
+```java
+<form:from method="post" modelAttribute="user">
+   ...
+</form:form>
+```
+스프링 폼 태그를 사용하면 폼 백업 객체(modelAttribute="user")의 값이 폼에 자동으로 바인딩되고, 폼을 제출할 때 폼의 값이 자동으로 폼 백업 객체에 바인딩된다.
+
+**컨트롤러가 폼 제출을 처리하는 메소드 가져오기**
+사용자가 폼을 제출하면 브라우저는 POST요청을 보낸다. 요청을 처리하는 메소드
+```java
+@RequestMapping(value = "/create-user", method = RequestMethod.POST)
+public String addTode(User user) {
+   logger.info("user details " + user);
+   return "redirect:list-users";
+}
+```
+* public String addTodo(User user) : 폼 백업 객체를 매개변수로 사용한다. 스프링 MVC는 폼의 값을 폼 백업 객체에 자동으로 바인딩한다.
+
+### 플로우6 : 이전 플로우에 유효성 검사 
+이전 플로우에서는 폼을 추가했지만 폼의 값을 확인하지는 않았다. 폼 내용의 유효성을 검사하기 위해 자바스크립트를 작성할 수는 있지만, 서버에서 유효성 검사를 실행해야 더 안전한다.
