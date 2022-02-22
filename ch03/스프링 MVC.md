@@ -93,5 +93,5 @@ src/main/webapp/WEB-INF/views/welcome.jsp를 생성하면 스프링 MVC는 welco
 </bean>
 ```
 * InternalResourceViewResolver : JSP를 지원하는 뷰 리졸버로 보통 JstlView가 사용된다.
-* <property name= ... </property> : 맵 뷰 리졸버에서 사용할 접두사와 접미사로 뷰 리졸버는 컨트롤러 메소드에서 문자열을 받아 뷰를(접두사 + 뷰 이름 + 접미사)로 변환한다. 따라서 뷰 이름인 welcome은 /WEB-INF/views/welcome.jsp로 해석된다.
+* <property name=...</property> : 맵 뷰 리졸버에서 사용할 접두사와 접미사로 뷰 리졸버는 컨트롤러 메소드에서 문자열을 받아 뷰를(접두사 + 뷰 이름 + 접미사)로 변환한다. 따라서 뷰 이름인 welcome은 /WEB-INF/views/welcome.jsp로 해석된다.
 
