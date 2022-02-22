@@ -114,27 +114,34 @@ public class BasicModleMapController {
 ``` jsp
 Welcome ${name}! This is coming from a model-map - a JSP
 ```
+![modelmap](https://user-images.githubusercontent.com/82895809/155109993-1ebbc75d-7d7d-4259-b420-9459624267d7.png)
+
+
 ${name)은 EL(Expression Language)구문을 사용해 모델의 속성에 액세스한다.
 
 ### 플로우4 : ModelAndView를 사용해 뷰로 전환하는 컨트롤러
 이전 플로우에서는 뷰 이름을 반환하고 뷰에서 사용할 속성으로 모델을 채웠다. 스프링 MVC는 모델과 뷰 세부 정보가 모두 포함된 단일 객체를 반환하는 대체 접근법을 제공한다. 
-#### Model, ModelMap vs ModelAndView
-> Model, ModelMap
-> * addAttribute를 사용한다.
-> * Model or ModelMap에 데이터만 저장 후 View에서 사용목적
-> ModelAndView
-> * addObject를 통해 데이터만 저장
-> * setViewName을 통해 이동하고자 하는 View를 저장
-> ```
-> @RequestMapping(value = "/test.do")
-public ModelAndView test(HttpServletRequest request, ModelAndView mv){
-        
-    String modelAndViewStr = "ModelAndView Test";
-    
-    mv.addObject("modelAndViewVar", modelAndViewStr);
-    mv.setViewName("temp/test");
-        
-    return mv;
+> Model, ModelMap vs ModelAndView
+>  > Model, ModelMap
+>  > * addAttribute를 사용한다.
+>  > * Model or ModelMap에 데이터만 저장 후 View에서 사용목적
+>  > ModelAndView
+>  > * addObject를 통해 데이터만 저장
+>  > * setViewName을 통해 이동하고자 하는 View를 저장
+
+```
+@Controller
+public class BasicModelViewController {
+   @RequestMapping(value = "/welcome-model-view")
+   public ModelAndView welcome(ModelMap model) {
+      model.put("name", "XYZ");
+      return new ModelAndView("welcome-model-view", model);
+   }
 }
-> ```
+```
+* return new ModelAndView("welcome-model-view", model) : 적절한 뷰 이름과 모델을 가진 ModelAndView 객체를 만든다.
+``` jsp
+Welcome ${name}! This is coming from a model-view - a JSP
+```
+![modelandview](https://user-images.githubusercontent.com/82895809/155110129-ed3a3bd5-4e39-443e-8522-039a1e8ce1f1.png)
 
