@@ -62,7 +62,8 @@ DispatcherServlet은 프론트 컨트롤러 패턴의 구현이다. 스프링 MV
 * @ResponseBody: 특정 컨텍스트에서 xxx메소드가 리턴한 텍스트는 응답 콘텐츠로 브라우저에 전송된다.
 
 ### 플로우2 : 뷰(JSP)로 간단한 컨트롤러 플로우 만들기
-브라우저에 표시할 콘텐츠는 일반적으로 뷰에서 생성된다.
+이전 플로우에서는 브라우저에 표시할 텍스트가 컨트롤러에 하드 코딩됐는데 보통은 브라우저에 표시할 콘텐츠는 일반적으로 뷰에서 생성된다.
+JSP를 뷰로 사용할 때 에는 InternalResourceViewResolver를 빈으로 등록해야한다.
 
 ``` java
 @Controller
@@ -73,7 +74,24 @@ public class BasicViewController {
    }
 }
 ```
-src/main/webapp/WEB-INF/views/welcome.jsp를 생성하면 스프링 MVC는 wel
+src/main/webapp/WEB-INF/views/welcome.jsp를 생성하면 스프링 MVC는 welcome메소드에서 리턴된 문자열을 /WEB-INF/views/welcome.jsp의 실제 JSP로 매핑한다.
+뷰 리졸버의 구성을 보면 알 수 있다.
 
+뷰 리졸버는 뷰 이름을 실제 JSP페이지로 해석한다.
 
+``` java
+<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+
+   <property name="prefix">
+      <value>/WEB-INF/views/</value>
+   </property>
+   
+   <property name="suffix">
+      <value>.jsp</value>
+   </property>
+
+</bean>
+```
+* InternalResourceViewResolver : JSP를 지원하는 뷰 리졸버로 보통 JstlView가 사용된다.
+* <property name= ... </property> : 맵 뷰 리졸버에서 사용할 접두사와 접미사로 뷰 리졸버는 컨트롤러 메소드에서 문자열을 받아 뷰를(접두사 + 뷰 이름 + 접미사)로 변환한다. 따라서 뷰 이름인 welcome은 /WEB-INF/views/welcome.jsp로 해석된다.
 
