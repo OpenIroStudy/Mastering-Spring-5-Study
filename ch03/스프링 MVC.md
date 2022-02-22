@@ -95,3 +95,46 @@ src/main/webapp/WEB-INF/views/welcome.jsp를 생성하면 스프링 MVC는 welco
 * InternalResourceViewResolver : JSP를 지원하는 뷰 리졸버로 보통 JstlView가 사용된다.
 * <property name=...</property> : 맵 뷰 리졸버에서 사용할 접두사와 접미사로 뷰 리졸버는 컨트롤러 메소드에서 문자열을 받아 뷰를(접두사 + 뷰 이름 + 접미사)로 변환한다. 따라서 뷰 이름인 welcome은 /WEB-INF/views/welcome.jsp로 해석된다.
 
+### 플로우3 : 모델이 있는 뷰로 전환하는 컨트롤러
+일반적으로 뷰를 생성하려면 일부 데이터를 뷰에 전달해야 한다. 스프링 MVC에서는 모델을 사용해 데이터를 뷰에 전달할 수 있다.
+
+``` java
+@Controller
+public class BasicModleMapController {
+   @RequestMapping(value = "/welcome-model-map")
+   public String welcome(ModleMap model) {
+      model.put("name", "XYZ");
+      return "welcome-model-map";
+   }
+}
+```
+* public String welcome(ModelMap model) : 새로 추가된 매개변수는 ModelMap모델이다. 스프링 MVC는 모델을 인스턴스화해 메소드에서 사용할 수 있도록 한다. 모델에 통합된 속성은 뷰에서 사용할 수 있다.
+* model.put("name", "XYZ") : 모델에 name이라는 속성 이름과 XYZ 값을 추가한다.
+
+``` jsp
+Welcome ${name}! This is coming from a model-map - a JSP
+```
+${name)은 EL(Expression Language)구문을 사용해 모델의 속성에 액세스한다.
+
+### 플로우4 : ModelAndView를 사용해 뷰로 전환하는 컨트롤러
+이전 플로우에서는 뷰 이름을 반환하고 뷰에서 사용할 속성으로 모델을 채웠다. 스프링 MVC는 모델과 뷰 세부 정보가 모두 포함된 단일 객체를 반환하는 대체 접근법을 제공한다. 
+#### Model, ModelMap vs ModelAndView
+> Model, ModelMap
+> * addAttribute를 사용한다.
+> * Model or ModelMap에 데이터만 저장 후 View에서 사용목적
+> ModelAndView
+> * addObject를 통해 데이터만 저장
+> * setViewName을 통해 이동하고자 하는 View를 저장
+> ```
+> @RequestMapping(value = "/test.do")
+public ModelAndView test(HttpServletRequest request, ModelAndView mv){
+        
+    String modelAndViewStr = "ModelAndView Test";
+    
+    mv.addObject("modelAndViewVar", modelAndViewStr);
+    mv.setViewName("temp/test");
+        
+    return mv;
+}
+> ```
+
