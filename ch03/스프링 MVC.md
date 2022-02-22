@@ -44,4 +44,14 @@ Srping MVC
 * 좀 더 일반적인 기능을 추가하는 조항을 제공한다.
 * 스프링 MVC는 프론트 컨트롤러에서 MVC패턴을 사용한다. 프론트 컨트롤러를 DispatcherServlet이라고 한다.
 
+## 스프링 MVC 여섯 가지 기본 플로우
+DispatcherServlet은 프론트 컨트롤러 패턴의 구현이다. 스프링 MVC의 모든 요청은 프론트 컨트롤러, 즉 DispatcherServlet이 처리할 것.
+* component-scan : 특정 패키지 내의 클래스를 스캔하고 annotation(@Component @Controller @Service @Repository)을 확인한 후 Bean인스턴스로 생성한다. 이를 이용하면 @Autowired와 @Qualifier annotation을 인식할 수 있다.
+* mvc:annotation-driven 
+*  * spring MVC컴포넌트들을 디폴트 설정을 통해 활성화한다.
+### 플로우1 : 뷰가 없는 컨트롤러
+
+
+
+
 
