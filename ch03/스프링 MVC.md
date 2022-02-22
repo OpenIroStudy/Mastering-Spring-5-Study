@@ -193,3 +193,253 @@ public String addTode(User user) {
 
 ### 플로우6 : 이전 플로우에 유효성 검사 
 이전 플로우에서는 폼을 추가했지만 폼의 값을 확인하지는 않았다. 폼 내용의 유효성을 검사하기 위해 자바스크립트를 작성할 수는 있지만, 서버에서 유효성 검사를 실행해야 더 안전한다.
+
+**하이버네이트 밸리데이터 의존 관계 추가**
+```java
+<dependency>
+   <groupId>org.hibernate</groupId>
+   <artifactId>hibernate-validator</artifactId>
+   <version>5.0.2.Final</version>
+</dependency>
+```
+
+빈 밸리데이션 API는 빈의 속성에 지정할 수 있는 여러 가지 유효성 검사를 지정한다.
+```java
+@Size(min = 6, message = "Enter at least 6 characters")
+private  String name;
+```
+
+컨트롤러 메소드를 가져와 폼의 유효성 검사
+```java
+@RequestMapping(value = "/create-user-with-validation", method = RequestMethod.POST)
+public String addTodo(@Valid User user, BindingResult result) {
+   if(result.hasErrors()) {
+      return "user";
+   }
+   
+   logger.info("user details " + user);
+   
+   return "redirect:list-users";
+}
+```
+* public String addTodo(@Valid User user, BindingResult result) : @Vaild 어노테이션이 사용되면 스프링 MVC는 빈의 유효성을 검증한다. 유효성 검사 결과는 BindingResult 인스턴스 결과에서 사용할 수 있다.
+> @Valid vs @Validated
+>  > @Validated는 @Valid의 기능을 포함한다. 쉽게 @Valid를 적용한 곳이라면 이는 @Validated로 변경 가능하다. 더하여 @Validated는 검토할 검토 옵션의 그룹을 지정할 수 있다.
+>  > @Vaild를 적용시킬 때는 제약조건을 달아놓은 속성에 대해 전부 유효성 검사를 하게 되는데, 만약 제약조건은 그대로 선언해놓되 원하는 속성만 유효성 검사를 하고싶은 경우에 사용하는 것이 @Validated이다.
+
+**@Validated 에시**
+```java
+public class UserAccount {
+    
+    @NotNull(groups = BasicInfo.class)
+    @Size(min = 4, max = 15, groups = BasicInfo.class)
+    private String password;
+ 
+    @NotBlank(groups = BasicInfo.class)
+    private String name;
+ 
+    @Min(value = 18, message = "Age should not be less than 18", groups = AdvanceInfo.class)
+    private int age;
+ 
+    @NotBlank(groups = AdvanceInfo.class)
+    private String phone;
+    
+    // standard constructors / setters / getters / toString   
+}
+```
+```java
+@RequestMapping(value = "/saveBasicInfoStep1", method = RequestMethod.POST)
+public String saveBasicInfoStep1(
+  @Validated(BasicInfo.class) 
+  @ModelAttribute("useraccount") UserAccount useraccount, 
+  BindingResult result, ModelMap model) {
+    if (result.hasErrors()) {
+        return "error";
+    }
+    return "success";
+}
+```
+
+**사용자 지정 유효성 검사 구현**
+@AssertTrue 어노테이션을 사용해 좀 더 복잡한 사용자 지정 유효성 검사를 구현할 수 있다.
+```java
+@AssertTure(message = "Password fields don`t match")
+private boolean isValid() {
+   return this.password.equals(this.password2);
+}
+```
+이러한 방법으로 여러 필드를 가진 복잡한 유효성 검사 로직을 구현할 수 있다.
+
+## 스프링 MVC
+스프링 MVC 프레임워크의 중요한 기능
+* 각 객체에 잘 정의된 독립적인 역할을 가진 느슨하게 결홥된 아키텍처다.
+* 매우 유연한 컨트롤러 메소드 정의다. 컨트롤러 메소드는 다양한 범위의 매개변수와 리턴 값을 가질 수 있다. 프로그래머는 필요에 맞는 정의를 유연하게 선택할 수 있게 된다.
+* 도메인 객체를 폼 백업 객체로 재사용할 수 있으며 별도의 폼 객체가 필요하지도 않다.
+* 현지화를 지원하는 내장 태그 라이브러리(spring, spring-form)가 있다.
+* 모델은 키-값 쌍이 있는 HashMap을 사용하며 여러 뷰 기술과 통합할 수 있다.
+* 유연한 바인딩이다. 바인딩하는 동안 불일치되는 타입은 런타임 에러 대신 유효성 검사 에러로 처리할 수 있다.
+* 단위 테스트 컨트롤러를 위한 MockMVC 프레임워크가 있다.
+
+**스프링 MVC 아키텍처의 주요 컴포넌트**
+![springmvc](https://user-images.githubusercontent.com/82895809/155123512-90940f88-91c2-4a51-ac5d-8530f451f7be.png)
+
+## 스프링 MVC의 핵심 개념
+### RequestMapping
+RequestMapping은 URI를 컨트롤러 또는 컨트롤러 메소드에 매핑하는 데 사용된다. 클래스나 메소드 레벨에서 수행할 수 있다. 선택적 메소드 매개변수를 사용하면 메소드를 특정 요청 메소드(GET, POST 등)에 매핑할 수 있다.
+
+### 뷰 리솔루션
+스프링 MVC는 매우 유연한 뷰 리솔루션, 다중 뷰 옵션을 제공한다.
+* JSP, 프리마커와의 통합
+* 다중 뷰 리솔루션 전략
+* 명시적으로 정의된 선호도 순서로 뷰 리졸버 체인을 지원한다.
+* 콘텐츠 협상을 사용해 XML, JSON 및 Atom을 직접 생산한다.
+
+## 프리마커 구성
+프리마커(FTL : Freemarker Template Language)는 널리 사용되는 자바 템플릿 엔징 중 하나다. 스프링 애플리케이션에서 프리마커를 사용해 뷰를 생성할 수 있다.
+![freemarker](https://user-images.githubusercontent.com/82895809/155125155-b7549b45-b298-416b-8ab6-898e15fc9d5e.png)
+
+## 핸들러 매핑 및 인터셉터 탐색
+HandlerInterceptors는 핸들러(또는 컨트롤러)의 요청을 인터셉트할 때 사용된다. 때로는 요청 전후에 일부 처리를 원할 수 있다. 요청이나 응답의 내용을 기록하거나 특정 요청에 걸린 시간을 확인해야 할 수도 있다.
+1. HandlerInterceptor정의
+2. HandlerInterceptor를 인터셉트할 특정 핸들러에 매핑
+
+**HandlerInterceptor정의**
+* public boolean preHandle : 핸들러 메소드가 호출되기 전에 호출된다.
+* public void postHandle : 핸들러 메소드가 호출된 후 호출된다.
+* public void afterCompletion : 요청 처리가 완료된 후 호출된다.
+
+# 동진 참고하시게
+
+![image](https://user-images.githubusercontent.com/67637716/154502123-bb8ddb98-2f22-41f4-af61-587c0e7a98d2.png)
+![image](https://user-images.githubusercontent.com/67637716/154502169-e567181b-a9c2-4cb9-8779-f66cd4e52fc0.png)
+따라서 요청이 들어오면 Filter → Interceptor → AOP → Interceptor → Filter 순으로 거치게 된다.
+
+출처: https://goddaehee.tistory.com/154 [갓대희의 작은공간]
+
+
+1. 서버를 실행시켜 서블릿이 올라오는 동안에 init이 실행되고, 그 후 doFilter가 실행된다. 
+
+2. 컨트롤러에 들어가기 전 preHandler가 실행된다
+
+3. 컨트롤러에서 나와 postHandler, after Completion, doFilter 순으로 진행이 된다.
+
+4. 서블릿 종료 시 destroy가 실행된다.
+
+
+
+
+
+Filter, Interceptor, AOP의 개념
+
+1.  Filter(필터)
+
+말그대로 요청과 응답을 거른뒤 정제하는 역할을 한다.
+
+
+
+서블릿 필터는 DispatcherServlet 이전에 실행이 되는데 필터가 동작하도록 지정된 자원의 앞단에서 요청내용을 변경하거나,  여러가지 체크를 수행할 수 있다.
+
+
+
+또한 자원의 처리가 끝난 후 응답내용에 대해서도 변경하는 처리를 할 수가 있다.
+
+보통 web.xml에 등록하고, 일반적으로 인코딩 변환 처리, XSS방어 등의 요청에 대한 처리로 사용된다.
+
+
+
+
+
+EX)
+
+<!-- 한글 처리를 위한 인코딩 필터 -->
+
+<filter>
+
+    <filter-name>encoding</filter-name>
+
+    <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+
+    <init-param>
+
+        <param-name>encoding</param-name>
+
+        <param-value>UTF-8</param-value>
+
+    </init-param>
+
+</filter>
+
+<filter-mapping>
+
+    <filter-name>encoding</filter-name>
+
+    <url-pattern>/*</url-pattern>
+
+</filter-mapping>
+
+
+
+해당 필터의 이름은 encoding, 값은 UTF-8인 파라미터를 정의하고 있다. 
+
+필터의 URL-PATTERN을 /*로 정의하면 servlet, jsp뿐만 아니라 이미지와 같은 모든 자원의 요청에도 호출 된다.
+
+
+
+[ 필터의 실행메서드 ]
+
+ㆍinit() - 필터 인스턴스 초기화
+
+ㆍdoFilter() - 전/후 처리
+
+ㆍdestroy() - 필터 인스턴스 종료
+
+
+
+
+
+2. Interceptor(인터셉터)
+
+
+
+요청에 대한 작업 전/후로 가로챈다고 보면 된다.
+
+
+
+필터는 스프링 컨텍스트 외부에 존재하여 스프링과 무관한 자원에 대해 동작한다. 
+
+하지만 인터셉터는 스프링의 DistpatcherServlet이 컨트롤러를 호출하기 전, 후로 끼어들기 때문에 스프링 컨텍스트(Context, 영역) 내부에서 Controller(Handler)에 관한 요청과 응답에 대해 처리한다.
+
+
+
+스프링의 모든 빈 객체에 접근할 수 있다.
+
+
+
+인터셉터는 여러 개를 사용할 수 있고 로그인 체크, 권한체크, 프로그램 실행시간 계산작업 로그확인 등의 업무처리
+
+
+
+인터셉터의 실행메서드
+
+preHandler() - 컨트롤러 메서드가 실행되기 전
+
+postHanler() - 컨트롤러 메서드 실행직 후 view페이지 렌더링 되기 전
+
+afterCompletion() - view페이지가 렌더링 되고 난 후
+
+
+
+
+
+
+
+
+
+# interceptor 사용법
+![image](https://user-images.githubusercontent.com/67637716/154502373-64178ad5-e26e-450e-ad23-19fdd882cd2a.png)
+HandlerInterceptor 인터페이스 구현  
+책에서 나오는 HandlerInterceptorAdator는 deprecated  
+![image](https://user-images.githubusercontent.com/67637716/154502538-ccb8961d-30f9-41a0-9644-6b1cbfefeb12.png)
+WebMvcConfigurer 구현  
+addInterceptors메서드 구현  
+
