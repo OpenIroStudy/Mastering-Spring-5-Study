@@ -51,9 +51,29 @@ DispatcherServlet은 프론트 컨트롤러 패턴의 구현이다. 스프링 MV
 * 이를 이용하면 @Autowired와 @Qualifier annotation을 인식할 수 있다.
 #### mvc:annotation-driven 
 * spring MVC컴포넌트들을 디폴트 설정을 통해 활성화한다.
+* spring MVC @Controller에 요청을 보내기 위해 필요한 HandlerMapping과 HandlerAdapter를 Bean으로 등록한다.
+   * HandlerMapping : HTTP 요청정보를 이용해서 컨트롤러를 찾아주는 기능
+   * HandlerAdapter : HandlerMapping을 통해 찾은 컨트롤러를 직접 실행하는 기능을 수행
+
+
 ### 플로우1 : 뷰가 없는 컨트롤러
+* @Controller : 요청 매핑을 포함할 수 있는 스프링 MVC 컨트롤러를 정의한다.
+* @RequesetMapping(value = "/xxx"): URL /xxx을 xxx메소드에 매핑하는 것을 정의. 브라우저가 /xxx에 요청을 보내면 스프링 MVC는 xxx메소드 실행.
+* @ResponseBody: 특정 컨텍스트에서 xxx메소드가 리턴한 텍스트는 응답 콘텐츠로 브라우저에 전송된다.
 
+### 플로우2 : 뷰(JSP)로 간단한 컨트롤러 플로우 만들기
+브라우저에 표시할 콘텐츠는 일반적으로 뷰에서 생성된다.
 
+``` java
+@Controller
+public class BasicViewController {
+   @RequestMapping(value = "/welcome-view")
+   public String welcome() {
+      return "welcome";
+   }
+}
+```
+src/main/webapp/WEB-INF/views/welcome.jsp를 생성하면 스프링 MVC는 wel
 
 
 
