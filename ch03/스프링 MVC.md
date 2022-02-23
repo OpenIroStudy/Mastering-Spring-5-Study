@@ -644,6 +644,160 @@ public class PersonController {
 
 #### @RestControllerAdvice와 @ControllerAdvice의 차이
 @Controller와 @RestController와 동일하게 @ResponseBody의 유무 차이만 있다.
-
 그러므로 결과 타입을 Json으로 내려줄지 아니면 View 페이지로 전달할지에 따라서 사용하면 된다.
+
 출처 : https://incheol-jung.gitbook.io/docs/q-and-a/spring/controlleradvice-exceptionhandler
+
+### 애플리케이션 국제화
+애플리케이션을 개발할 때는 여러 지역에서 사용할 수 있길 원한다. 
+
+사용자에게 표시되는 텍스트는 사용자의 위치나 언어에 따라 지정할 수 있는데 이를 국제화(18n) 또는 현지화라고 한다.
+
+* SessionLocaleResolver
+* CookieLocaleResolver
+
+SessionLocaleResolver는 사용자가 선택한 지역이 사용자 세션에 저장되므로 사용자 세션에만 유효하다.
+CookieLocalResolver는 선택한 지역이 쿠키로 저장된다.
+
+### 정적 리소스 제공
+
+## 스프링 MVC 애플리케이션의 단위 테스트
+기본 설정
+``` java
+public class BasicControllerTest {
+	private MockMvc mockMvc;
+	
+	@Before
+	public void setup() {
+		this.mockMvc = MockMvcBuilders.standaloneSetup(new BasicController()).build();
+	}
+}
+```
+
+* mockMvc : 여러 테스트에서 사용될 수 있는 변수다. MockMvc 클래스의 인스턴스 변수를 정의한다.
+* @Before setup : 모든 테스트 전에 실행돼 MockMvc를 초기화한다.
+* MockMvcBuilders.standaloneSetup(new BasciController()).build() : MockMvc인스턴스를 빌드한다. 인스턴스에서는 설정된 컨트롤러(BasicController)로 요청을 처리하기 위해 DispatcherServlet을 초기화한다.
+
+테스트 메소드
+```java
+@Test
+public void basicTest() throws Exception {
+	this.mockMvc
+		...;
+}
+
+```
+* MockMvc mockMvc.perform : 요청을 실행하고 연결된 호출을 허용하는 ResultActions 인스턴스를 반환하는 메소드다.
+* andExpect : 예상한 값을 확인할 때 사용된다. 예상한 값이 맞지 않으면 테스트에 실패
+* get... : get요청 작성.
+* status().isOk() : ResultMatcher를 사용해 응답 상태가 성공적인 요청(200)인지 확인한다.
+
+### MockMvc 요청 설정 메소드
+![요청 설정 메소드](https://user-images.githubusercontent.com/82895809/155278626-4f301f54-f1f1-454f-b308-eab16301e550.png)
+
+### 검증 메소드
+![검증 메소드](https://user-images.githubusercontent.com/82895809/155278684-580ddfe2-1fd9-42f3-87d3-0d941c8dd2f2.png)
+
+### 속성 및 사용법
+![속성 및 사용법](https://user-images.githubusercontent.com/82895809/155278839-a178833e-6c30-4509-8f34-5f5dfe354140.png)
+
+출처 : https://velog.io/@jkijki12/Spring-MockMvc
+
+## 스프링 MVC 컨트롤러의 통합 테스트 작성
+앞에서 테스트 중인 특정 컨트롤러만 로드하는 컨트롤러의 단위 테스트를 작성했다.
+
+작성할 수 있는 다른 종류의 테스트는 전체 애플리케이션을 시작하는 기본 통합 테스트, 즉 전체 스프링 컨텍스트다.
+```java
+@RunWith(SpringRunner.class)
+@WebAppConfiguration
+@ContextConfiguration("file:src/main/webapp/WEB-INF/user-web-context.xml")
+public class BasicControllerSpringConfigurationIT {
+	private MockMvc mockMvc;
+	
+	@Autowired
+	private WebApplicationContext wac;
+	
+	@Before
+	public void setup() {
+		this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
+	}
+}
+```
+* @RunWith : SpringRunner는 스프링 컨텍스트를 시작하는데 도움이 된다.
+* @WebAppConfiguration : 스프링 MVC로 웹 애플리케이션 컨텍스트를 시작하는데 사용된다.
+* @ContextConfiguration : 스프링 컨텍스트 XML의 위치를 지정한다.
+* this.mockMvc = ... : 전체 웹 앱을 시작하기 위해서 webAppContextSetup을 사용한다.
+
+## 스프링 시큐리티
+시큐리티는 모든 애플리케이션의 중요한 구성요소다.
+
+스프링 시큐리티는 자바 EE 엔터프라이즈 애플리케이션을 위한 포괄적인 시큐리티 솔루션을 제공한다.
+
+Filter기반으로 동작하여 MVC와 분리하여 관리 및 동작한다.
+
+스프링 기반 애플리케이션에 강력한 지원을 제공하는 동시에 다른 프레임워크와 통합할 수 있다.
+
+다음 리스트는 스프링 시큐리티가 지원하는 광범위한 인증 메커니즘 중 일부다.
+* 폼 기반 인증 : 기본 애플리케이션을 위한 간단한 통합
+* LDAP : 일반적으로 대부분 엔터프라이즈 애플리케이션에서 사용
+* JAAS(Java Authentication and Authorization Service) : 인증 및 권한 표준, 자바 EE 표준 스펙의 일부
+* 컨테이너 - 관리 인증
+* 커스텀 인증 시스템
+
+> 기본 용어
+> * 접근 주체(Principal) : 보호된 리소스에 접근하는 대상
+> * 인증(Authentication) : 보호된 리소스에 접근한 대상에 대해 누구인지, 애플리케이션의 작업을 수행해도 되는 주체인지 확인하는 과정
+> * 인가(Autorize) : 해당 리소스에 대해 접근 가능한 권한을 가지고 있는지 확인하는 과정(After Authentication, 인증 이후)
+> * 권한 : 어떠한 리소스에 대한 접근 제한, 모든 리소스는 접근 제어 권한이 걸려있음. 인가 과정에서 해당 리소스에 대한 제한된 최소한의 권한을 가졌는지 확인
+
+```java
+<dependency> 
+	<groupId>org.springframework.security</groupId> 
+	<artifactId>spring-security-web</artifactId> 
+</dependency>
+
+<dependency> 
+	<groupId>org.springframework.security</groupId> 
+	<artifactId>spring-security-config</artifactId> 
+</dependency>
+```
+
+### 모든 요청을 인터셉트하도록 필터 설정
+시큐리티를 구현할 때 가장 좋은 방법은 들어오는 모든 요청의 유효성을 검사하는 것이다.
+
+필터를 사용해 요청을 인터셉트해 유효성을 검사한다.
+스프링 관리 빈 FilterChainProxy에 위임하는 DelegationFilterProxy 필터를 사용한다.
+```java
+<filter>
+	<filter-name>springSecurityFilterChain</filter-name>
+	<filter-class>
+		org.springframework.web.filter.DelegationFilterProxy
+	</filter-class>
+</filter>
+
+<filter-mapping>
+	<filter-name>springSecurityFilterChain</filter-name>
+	<url-pattern>/*</url-pattern>
+</filter-mapping>
+```
+스프링 시큐리티는 필터 기반이다. 주요 로직들은 모두 필터를 거치고 컨트롤러 단에 닿을 수 있다.
+![filter](https://user-images.githubusercontent.com/82895809/155282287-dcec398a-0304-455d-a8a7-e11fcb9bf62b.png)
+위 사진은 스프링 MVC의 Request 처리 과정이다.
+Filter를 거치고, Dispatcher Servlet을 거친다. 그 후에서야 컨트롤러를 찾는 과정을 볼 수 있다.
+
+스프링 시큐리티는 디스패처 서블릿에 도달하기 전에 로직을 수행하는 걸 알 수 있다.
+
+![chain](https://user-images.githubusercontent.com/82895809/155282500-8c9191a2-88ef-4dc4-ae12-80f3751b7fca.png)
+
+시큐리티에는 여러 Filter가 존재하며, 각 책임에 따른 필터들을 순서대로 처리 후에 DispatcherServlet으로 보낸다.
+
+필터는 1개만 등록시킬 수 있는게 아닌, Filter Chain으로 시큐리티에 등록된 순서대로 로직이 처리된다.
+
+#### DelegatingFilterProxy
+![delegatingFilterProxy](https://user-images.githubusercontent.com/82895809/155284698-d4a2a2f9-2372-49ce-86c9-bf07d0e73d6a.png)
+
+* 일반적인 서블릿 필터이다.
+* 서블릿 필터 처리를 직접 하지않고 스프링에 들어있는 빈으로 위임하고 싶을 때 사용하는 서블릿 필터이다.
+* Spring IOC 컨테이너에 존재하는 특정 빈에게 위임하게 된다.
+* 위임할 대상의 이름을 명시해 주어야 한다.
+* SpringBoot를 사용한다면, 자동으로 설정이 된다.(SecurityFilterAutoConfiguration)
