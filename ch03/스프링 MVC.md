@@ -4,6 +4,7 @@
 Srping MVC
 ===========
 스프링 MVC는 자바 서블릿 기반 웹 애플리케이션을 개발할 때 가장 많이 사용하는 웹 프레임워크다.
+
 스프링 MVC는 깔끔하고 느슨하게 결합된 아키텍처라는 장점이 있다
 <hr>
 
@@ -34,7 +35,9 @@ Srping MVC
 
 ## 모델2 프론트 컨트롤러
 모델2 아키텍처의 기본 버전에서 브라우저의 요청은 다른 서블릿(또는 컨트롤러)에 의해 직접 처리된다.
+
 여러 비즈니스 시나리오에서 요청을 처리하기 전에 서블릿에서 몇 가지 일반적인 작업을 수행하려고 한다.
+
 모델2 프론트 컨트롤러 아키텍처에서는 모든 요청이 프론트 컨트롤러라는 단일 컨트롤러로 전달된다.
 
 <img src="https://user-images.githubusercontent.com/82895809/154873339-fd9e65b7-38eb-4f38-be41-d8cb94b74b5b.png" width="300px" height="500px"></img>
@@ -119,7 +122,10 @@ Welcome ${name}! This is coming from a model-map - a JSP
 ${name)은 EL(Expression Language)구문을 사용해 모델의 속성에 액세스한다.
 
 ### 플로우4 : ModelAndView를 사용해 뷰로 전환하는 컨트롤러
-이전 플로우에서는 뷰 이름을 반환하고 뷰에서 사용할 속성으로 모델을 채웠다. 스프링 MVC는 모델과 뷰 세부 정보가 모두 포함된 단일 객체를 반환하는 대체 접근법을 제공한다. 
+이전 플로우에서는 뷰 이름을 반환하고 뷰에서 사용할 속성으로 모델을 채웠다. 
+
+스프링 MVC는 모델과 뷰 세부 정보가 모두 포함된 단일 객체를 반환하는 대체 접근법을 제공한다. 
+
 > Model, ModelMap vs ModelAndView
 >  > Model, ModelMap
 >  > * addAttribute를 사용한다.
@@ -192,7 +198,9 @@ public String addTode(User user) {
 * public String addTodo(User user) : 폼 백업 객체를 매개변수로 사용한다. 스프링 MVC는 폼의 값을 폼 백업 객체에 자동으로 바인딩한다.
 
 ### 플로우6 : 이전 플로우에 유효성 검사 
-이전 플로우에서는 폼을 추가했지만 폼의 값을 확인하지는 않았다. 폼 내용의 유효성을 검사하기 위해 자바스크립트를 작성할 수는 있지만, 서버에서 유효성 검사를 실행해야 더 안전한다.
+이전 플로우에서는 폼을 추가했지만 폼의 값을 확인하지는 않았다. 폼 내용의 유효성을 검사하기 위해 자바스크립트를 작성할 수는 있지만, 
+
+서버에서 유효성 검사를 실행해야 더 안전한다.
 
 **하이버네이트 밸리데이터 의존 관계 추가**
 ```java
@@ -294,11 +302,11 @@ RequestMapping은 URI를 컨트롤러 또는 컨트롤러 메소드에 매핑하
 * 명시적으로 정의된 선호도 순서로 뷰 리졸버 체인을 지원한다.
 * 콘텐츠 협상을 사용해 XML, JSON 및 Atom을 직접 생산한다.
 
-## 프리마커 구성
+#### 프리마커 구성
 프리마커(FTL : Freemarker Template Language)는 널리 사용되는 자바 템플릿 엔징 중 하나다. 스프링 애플리케이션에서 프리마커를 사용해 뷰를 생성할 수 있다.
 ![freemarker](https://user-images.githubusercontent.com/82895809/155125155-b7549b45-b298-416b-8ab6-898e15fc9d5e.png)
 
-## 공통 프로세스에 대한 고민
+### 공통 프로세스에 대한 고민
 
 공통 업무에 관련된 코드를 모든 페이지마다 작성 해야한다면 중복된 코드가 많아지게 되고 
 
@@ -329,7 +337,7 @@ RequestMapping은 URI를 컨트롤러 또는 컨트롤러 메소드에 매핑하
 
 Filter, Interceptor, AOP의 개념
 
-### Filter(필터)
+#### Filter(필터)
 말그대로 요청과 응답을 거른뒤 정제하는 역할을 한다.
 
 서블릿 필터는 DispatcherServlet 이전에 실행이 되는데 필터가 동작하도록 지정된 자원의 앞단에서 요청내용을 변경하거나,  여러가지 체크를 수행할 수 있다.
@@ -376,7 +384,7 @@ EX)
 * destroy() - 필터 인스턴스 종료
 
 
-### Interceptor(인터셉터)
+#### Interceptor(인터셉터)
 요청에 대한 작업 전/후로 가로챈다고 보면 된다.
 
 필터는 스프링 컨텍스트 외부에 존재하여 스프링과 무관한 자원에 대해 동작한다. 
@@ -403,13 +411,239 @@ Controller는 Dispatcher Servlet과 협업하여 web request를 실행하고 vie
 ![deprecated](https://user-images.githubusercontent.com/82895809/155250962-49a9410f-e1f2-44fa-8541-50eb69c2c092.png)
 **현재 HandlerInterceptorAdapter는 deprecated가 되었다.**
 
-### interceptor 사용법
-![image](https://user-images.githubusercontent.com/67637716/154502373-64178ad5-e26e-450e-ad23-19fdd882cd2a.png)
-HandlerInterceptor 인터페이스 구현  
-책에서 나오는 HandlerInterceptorAdator는 deprecated  
-![image](https://user-images.githubusercontent.com/67637716/154502538-ccb8961d-30f9-41a0-9644-6b1cbfefeb12.png)
-WebMvcConfigurer 구현  
-addInterceptors메서드 구현  
+![interceptor](https://user-images.githubusercontent.com/82895809/155252108-4958b5e7-cf6b-4b17-8221-c374c3cb78a7.png)
+* /test라는 요청이 들어오면 DispatcherServlet이 HandlerMapping을 통해 /test라는 요청에 해당하는 Controller를 선택하도록 시킨다.
+* Interceptor의 preHandle 메소드가 /test 요청을 Controller가 동작하기 이전에 가로챈다.
+* Controller가 실행
+* Interceptor의 postHandle 메소드가 Controller가 실행된 이후 동작한다.
+* postHandle 메소드가 실행되고 View가 실행되어 response를 클라이언트에게 전달한다.
+* Interceptor의 afterCompletion 메소드가 View가 실행된 이후에 동작한다.
 
-## 세션 속성 사용
+#### interceptor 사용법
+![image](https://user-images.githubusercontent.com/67637716/154502373-64178ad5-e26e-450e-ad23-19fdd882cd2a.png)
+↑ HandlerInterceptor 인터페이스 구현
+
+![image](https://user-images.githubusercontent.com/67637716/154502538-ccb8961d-30f9-41a0-9644-6b1cbfefeb12.png)
+↑ WebMvcConfigurer 구현, addInterceptors메서드 구현  
+
+### 모델 속성
+공통 사항은 일반적으로 @ModelAttribute 어노테이션으로 표시된 메소드를 사용해 모델에 채워진다.
+
+@ModelAttribute 어노테이션으로 표시할 수 있는 메소드 수에 제한이 없다는 점이다.
+
+컨트롤러 어드바이스를 사용하면 여러 컨트롤러에서 모델 속성을 공통으로 지정할 수 있다.
+
+### 세션 속성 사용
 스프링 MVC는 세션에 저장되는 속성을 지정하는 단순 타입 레벨(클래스 레벨) 어노테이션인 @SessionAttributes를 제공한다.
+
+#### HttpSession
+기본적으로 HttpSession을 이용해서 session에 값을 넣고, session에서 값을 가져올 수 있다.
+
+* setAttribute()
+```java
+public class SampleController {
+    @GetMapping(value="/hello")
+    public String httpSession(HttpSession session){
+        Long memberId =100L;
+        session.setAttribute("test",memberId);
+        return String.valueOf(memberId);
+    }
+}
+```
+
+* getAttribute()
+```java
+public class SampleController {
+    @GetMapping(value="/hello_2")
+    public String getHttpSession(HttpSession session){
+        Long memberId = (Long)session.getAttribute("memberId");
+        return String.valueOf(memberId);
+    }
+}
+```
+
+#### @SessionAttribute
+@SessiongAttribute는 요청 session에서 명시한 key에 해당하는 값을 바인딩해준다.
+
+HttpSession을 직접 사용할 경우, getAttribute는 Object 형식으로 반환하지만 @SessionAttribute를 사용하면, 형식에 맞게 알아서 바인딩을 해준다.
+``` java
+public class SampleController {
+    @GetMapping(value="/hello_3")
+    public String sessionAttribute(@SessionAttribute("memberId") Long id){
+        return String.valueOf(id);
+    }
+}
+```
+
+위 예시처럼 @SessionAtrribute("key-name")으로 원하는 값을 지정할 수도 있지만, 바인딩할 변수와 key 이름이 같은 경우 key-name 지정이 생략 가능하다.
+``` java
+public class SampleController {
+    @GetMapping(value="/hello_3")
+    public String sessionAttribute(@SessionAttribute Long memberId){
+        return String.valueOf(memberId);
+    }
+}
+```
+#### @SessionAttributes
+@SessionAttributes로 선언된 session-key와 같은 이름의 modelAttribute-key가 model에 등록된다면, @SessionAttributes가 알아서 session으로 바인딩 해준다.
+``` java
+@RestController
+@SessionAttributes("memberId")
+public class SampleController {
+    @GetMapping(value="/login")
+    public String login(Model model, @RequestParam String memberId){
+        model.addAttribute("memberId", memberId);
+        return memberId;
+    }
+}
+```
+@SessionAttributes로 "memberId"를 선언했으므로, model에 "memberId" 이름의 키를 추가할 때, 자동적으로 세션에 추가된다.
+
+#### @SessionAttributes 사용 이유
+@SesssionAttributes는 컨트롤러 전역에 걸쳐, 핸들러끼리 session을 공유하기 위해 사용된다.
+
+예를 들면, 회원 가입 시 여러 페이지를 거치는 경우처럼 '여러 핸들러에서 같은 자원을 반복적으로 사용할테니,
+modelAttributes에 해당 자원이 추가되면, 알아서 세션에도 추가해줘라'라고 선언하는 것이다.
+
+#### 세션에서 속성 제거
+사용을 마쳤을 때는 SessionStatus로 세션을 무력화한다.
+```java
+@GetMapping(value="/complete")
+public String complete(SessionStatus sessionStatus){
+    sessionStatus.setComplete();
+    return "hello";
+}
+```
+### InitBinder의 필요성
+파라미터의 수집은 다른 용어로 binding(바인딩)이라고 한다.
+
+일반적인 웹 폼에는 날짜, 통화, 금액이 있다. 폼의 값은 폼 백업 오브젝트에 바인딩돼야 한다.
+
+대부분 데이터타입은 자동으로 스프링이 변환해서 처리해주지만
+경우에 따라서는 파라미터를 직접 변환해주어야 할 때가 있다.
+```java
+@InitBinder
+public void initBinder(WebDataBinder binder) {
+	SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+	binder.registerCustomEditor(java.util.Date.class, new CustomDateEditor(dateFormat, false));
+}
+```
+### @ContorllerAdvice 어노테이션을 사용해 공통 기능 구현하기
+컨트롤러 레벨에서 정의한 일부 기능은 애플리케이션에서 공통적으로 나타날 수 있다.
+
+예를 들어 애플리케이션에서 동일한 날짜 형식을 사용할 수 있어서 앞에서 정의한 @Initbinder를 애플리케이션 전체에 적용할 수 있다.
+
+@ControllerAdvice는 기본적으로 모든 RequestMapping에서 공통적인 기능을 만들도록 도와준다.
+
+컨트롤러 어드바이스는 공통 모델 속성(@ModelAttribute)와 일반적인 예외 처리를 정의하는 데 사용할 수도 있다.
+
+## 스프링 MVC 고급 기능
+* 웹 애플리케이션의 일반적인 예외 처리
+* 메시지 국제화
+* 스프링 시큐리티
+
+### 예외 처리 구현하기
+예외 처리 전략을 세우는 것은 상당히 중요하다. 잘 설계되고 잘 작성된 애플리케이션의 경우에도 예외 처리는 제대로 수행해야 한다.
+
+스프링 프레임워크에서 대부분 예외는 확인되지 않은 예외로 렌더링됐다. 
+특정 예외 처리가 필요 없으면 일반적으로 애플리케이션 전체에서 예외를 처리할 수 있다.
+
+#### 예외 복구 범위
+* 메소드 영역 : 메소드 영역은 종속된 복구 기능으로 단순히 try, catch 사용하면 된다.
+* 클래스 영역 : 클래스 내 공통 예외 복구는 @ExceptionHandler 사용할 수 있다.
+* 전역 영역 : 여러 클래스의 공통 예외 복구는 @ControllerAdvice 사용할 수 있다.
+
+### 컨트롤러 내 예외처리 (@ExceptionHandler)
+```java
+@RestController
+@RequestMapping("/ex")
+public class PersonController {
+    @GetMapping
+    public String test(){
+        return "test";
+    }
+
+    @GetMapping("/exception")
+    public String exception1(){
+        throw new NullPointerException();
+    }
+
+    @GetMapping("/exception2")
+    public String exception2(){
+        throw new ClassCastException();
+    }
+
+    @ExceptionHandler({NullPointerException.class, ClassCastException.class})
+    public String handle(Exception ex){
+        return "Exception Handle!!!";
+    }
+}
+```
+/ex/exception이라는 api를 호출하면 NullPointerException이 발생하지만 @ExceptionHandler를 사용하여
+"Exception Handle!!!"라는 문자열을 리턴할 것이다. (/ex/exception2를 호출해도 결과는 똑같다.)
+
+이렇듯 다중 Exception도 하나의 ExceptionHandler에서 처리할 수 있는 것을 확인할 수 있다.
+
+### 컨트롤러 전반의 일반적인 예외 처리 (@ControllerAdvice)
+```java
+@RestControllerAdvice
+public class ControllerSupport {
+
+    @ExceptionHandler({NullPointerException.class, ClassCastException.class})
+    public String handle(Exception ex) {
+        return "Exception Handle!!!";
+    }
+}
+```
+↑ ControllerSupport클래스 생성
+
+그리고 두 개의 Controller를 생성하여 Exception 발생
+```java
+@RestController
+@RequestMapping("/school")
+public class SchoolController {
+    @GetMapping
+    public String test(){
+        return "test";
+    }
+
+    @GetMapping("/exception")
+    public String exception1(){
+        throw new NullPointerException();
+    }
+
+    @GetMapping("/exception2")
+    public String exception2(){
+        throw new ClassCastException();
+    }
+}
+
+@RestController
+@RequestMapping("/person")
+public class PersonController {
+    @GetMapping
+    public String test(){
+        return "test";
+    }
+
+    @GetMapping("/exception")
+    public String exception1(){
+        throw new NullPointerException();
+    }
+
+    @GetMapping("/exception2")
+    public String exception2(){
+        throw new ClassCastException();
+    }
+}
+```
+컨트롤러 내에서는 Exception만 발생시키고 Exception을 처리하는 로직은 존재하지 않는다. api를 호출하면
+동일하게 Exception 처리에 대한 메시지를 전달해준다.
+
+@ExceptionHandler뿐만 아니라 @InitBinder, @ModelAttibute 또한 사용할 수 있다.
+
+#### @RestControllerAdvice와 @ControllerAdvice의 차이
+@Controller와 @RestController와 동일하게 @ResponseBody의 유무 차이만 있다.
+
+그러므로 결과 타입을 Json으로 내려줄지 아니면 View 페이지로 전달할지에 따라서 사용하면 된다.
+출처 : https://incheol-jung.gitbook.io/docs/q-and-a/spring/controlleradvice-exceptionhandler
