@@ -310,7 +310,7 @@ HandlerInterceptors는 핸들러(또는 컨트롤러)의 요청을 인터셉트�
 
 **현재 HandlerInterceptorAdapter는 deprecated가 되었다.**
 
-> 공통 프로세스에 대한 고민
+> ## 공통 프로세스에 대한 고민
 ![fia](https://user-images.githubusercontent.com/82895809/155128016-eb11b839-ab80-4cd4-a792-c5e75076c379.png)
 
 요청이 들어오면 Filter → Interceptor → AOP → Interceptor → Filter 순으로 거치게 된다.
