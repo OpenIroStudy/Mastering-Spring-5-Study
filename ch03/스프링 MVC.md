@@ -387,22 +387,21 @@ EX)
 
 인터셉터는 여러 개를 사용할 수 있고 로그인 체크, 권한체크, 프로그램 실행시간 계산작업 로그확인 등의 업무처리
 
-인터셉터의 실행메서드
+자바에서는 **HandlerInterceptor**라는 인터페이스가 interceptor의 역할을 한다.
 
-## 핸들러 매핑 및 인터셉터 탐색
-HandlerInterceptors는 핸들러(또는 컨트롤러)의 요청을 인터셉트할 때 사용된다. 때로는 요청 전후에 일부 처리를 원할 수 있다. 요청이나 응답의 내용을 기록하거나 특정 요청에 걸린 시간을 확인해야 할 수도 있다.
-1. HandlerInterceptor정의
-2. HandlerInterceptor를 인터셉트할 특정 핸들러에 매핑
+여기서 handler라는 단어가 있는데 여기서는 Controller의 역할로 사용한다.
+
+통상적으로 handler는 Controller를 포함한 HttpRequestHandler, WebRequestHandler 등과 같이 Dispatcher Servlet과 함께 일하는 것들을 통칭한다.
+
+Controller는 Dispatcher Servlet과 협업하여 web request를 실행하고 view를 반환하기 때문에 handler라고 불려진다.
 
 **HandlerInterceptor정의**
-* public boolean preHandle : 핸들러 메소드가 호출되기 전에 호출된다.
-* public void postHandle : 핸들러 메소드가 호출된 후 호출된다.
-* public void afterCompletion : 요청 처리가 완료된 후 호출된다.
+* public boolean preHandle : 핸들러 메소드가 호출되기 전에 호출된다. (Controller 동작 이전)
+* public void postHandle : 핸들러 메소드가 호출된 후 호출된다. (Controller 동작 이후, View 동작 이전)
+* public void afterCompletion : 요청 처리가 완료된 후 호출된다. (View 동작 이후)
 
+![deprecated](https://user-images.githubusercontent.com/82895809/155250962-49a9410f-e1f2-44fa-8541-50eb69c2c092.png)
 **현재 HandlerInterceptorAdapter는 deprecated가 되었다.**
-* preHandler() - 컨트롤러 메서드가 실행되기 전
-* postHanler() - 컨트롤러 메서드 실행직 후 view페이지 렌더링 되기 전
-* afterCompletion() - view페이지가 렌더링 되고 난 후
 
 ### interceptor 사용법
 ![image](https://user-images.githubusercontent.com/67637716/154502373-64178ad5-e26e-450e-ad23-19fdd882cd2a.png)
