@@ -1,5 +1,4 @@
 # 크로스 컷팅
-
 스프링 애플리케이션은 레이어 구조로 만들어진다.  
 일반적으론 프리젠테이션, 비즈니스, 데이터 레이어로 나뉘어진다.  
 이것을 3 Tier Architecture 라고 한다.  
@@ -173,3 +172,16 @@ Enhancer클래스 바탕으로 Target Class를 상속받아 생성
 * Spring AOP는 Proxy를 기반으로 한 Runtime Weaving 방식이다.
 * Spring AOP에서는 JDK Dynamic Proxy 와 CGlib 을 통해 Proxy화 한다.
 * JDK Dynamic Proxy는 Reflection을 기반으로 이루어지고 CGlib 은 상속을 기반으로 이루어진다.
+
+<br>
+
+# AOP 사용하기
+AspectJ는 자바에서 가장 널리 사용되는 AOP 프레임워크다. AspectJ는 컴파일 타임 위빙을 제공한다.  
+스프링 AOP는 AspectJ와 몇 가지 기본 AOP기능과의 통합을 제공하며 , 런타임 위빙을 수행한다.  
+간단하게 사용할 수 있지만, 스프링 빈에서 메소드 호출만 인터셉트 할 수 있다.  
+
+스프링 빈으로 작업 중이고 스프링 빈에서 메소드 호출을 인터셉트하려는 경우, 스프링 AOP면 충분하다.  
+스프링 컨테이너에 의해 관리되지 않는 객체의 메소드 호출을 가로채려면 완전한 AOP 프레임워크인 AspectJ를 사용해야 한다.  
+
+스프링 부트로 AOP를 사용하기 위해 사용할 스타터는 spring-boot-starter-aop다.
+
