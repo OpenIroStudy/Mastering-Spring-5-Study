@@ -345,5 +345,6 @@ Object getTarget()
 Object[] getArgs()  
  - 클라이언트가 메서드를 호출할 때 넘겨준 인자 목록을 Object 배열로 리턴
 
+@Annotation의 속성값 가져오기  
 ![image](https://user-images.githubusercontent.com/67637716/155682465-8b929d67-7511-47d4-b482-1689c4152315.png)
 
