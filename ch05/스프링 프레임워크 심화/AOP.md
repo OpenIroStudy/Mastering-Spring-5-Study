@@ -304,3 +304,29 @@ AspectJ는 메서드 호출을 위한 여러 가지 인터셉션 포인트를 �
 * @AfterReturning : 메서드가 성공적으로 실행된 후, 메소드 반환값 획득 가능
 * @AfterThrowing : 메서드 호출 후 예외가 발생했을 시
 * @Around : 메소드 호출 자체를 가로채서 비즈니스 메소드 실행 전&후 모두에 처리할 로직을 삽입할 수 있음.
+
+``` java
+ @Aspect 
+    @Component 
+    public class LogAspect { 
+        // Aspect : 부가 기능 구현체들을 포함하고 있는 모듈 
+        private final Logger logger = LoggerFactory.getLogger(this.getClass()); 
+       
+        // PointCut : 적용할 지점 또는 범위 선택 
+        @Pointcut("execution(public * com.example.demo.service..*(..))") 
+        private void publicTarget() { } 
+        
+        // Advice : 실제 부가기능 구현부 
+        @Around("publicTarget()")
+        public Object calcPerformanceAdvice(ProceedingJoinPoint pjp) throws Throwable { 
+            logger.info("성능 측정을 시작합니다."); 
+            StopWatch sw = new StopWatch(); 
+            sw.start(); 
+            // 비즈니스 로직 (메인 로직) 
+            Object result = pjp.proceed(); 
+            sw.stop(); 
+            logger.info("성능 측정이 끝났습니다."); 
+            logger.info("걸린시간: {} ms", sw.getLastTaskTimeMillis()); return result; } 
+        }
+        }
+```
