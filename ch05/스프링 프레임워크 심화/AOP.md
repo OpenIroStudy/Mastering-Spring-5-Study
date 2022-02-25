@@ -295,3 +295,12 @@ class UserService implements DefaultService{
 @Around("@annotation(kr.co.openlabs.mtf.client.aop.GlobalTransaction)")
 ```
 
+<br>
+
+### aspect 클래스 정의하기
+AspectJ는 메서드 호출을 위한 여러 가지 인터셉션 포인트를 제공한다.  
+* @Before : 메서드를 실행하기 전
+* @After : 메서드 실행 후. 메서드가 예외를 발생시키더라도 실행
+* @AfterReturning : 메서드가 성공적으로 실행된 후
+* @AfterThrowing : 메서드 호출 후 예외가 발생했을 시
+* @Around : 메서드 실행을 완전히 제어.
