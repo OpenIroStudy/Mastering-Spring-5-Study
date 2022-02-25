@@ -184,4 +184,87 @@ AspectJ는 자바에서 가장 널리 사용되는 AOP 프레임워크다. Aspec
 스프링 컨테이너에 의해 관리되지 않는 객체의 메소드 호출을 가로채려면 완전한 AOP 프레임워크인 AspectJ를 사용해야 한다.  
 
 스프링 부트로 AOP를 사용하기 위해 사용할 스타터는 spring-boot-starter-aop다.
+spring-boot-starter-aop는 스프링aop와 aspectJ의 의존 관계를 추가한다.  
+
+의존성 주입 후 Aspect를 사용한다고 활성화 해야함.  
+@Configuration에 @EnableAspectAutoProxy를 추가 
+=====> @SpringBootApplication안에 @EnableAutoConfiguration에 포함되어있음.  
+@EnableAutoConfiguration으로 사용하는 AOP방식이 CGLIB으로 되어있음.  
+JDK Dynamic proxy를 사용하고자 할때 @EnableAspectJAutoProxy를 추가하여 커스텀 해주면 됨.  
+
+1. Aspect 선언
+Aspect로 이용하기 위해서는 bean으로 등록해야한다.  
+하지만 @Aspect만으로는 bean등록이 되지않아서 component-scan으로 bean등록이 될 수 있도록 @Component를 함께 선언한다.  
+``` java
+@Aspect
+@Component
+public class TimeCheckAspect {}
+```
+
+## Annotations
+### @Pointcut
+포인트 컷이란 메소드의 Joinpoint에 대한 Advice가 언제 실행될 지를 지정하는데 사용한다.  
+여러 메소드의 Joinpoint시점 여러개를 묶어 하나의 pointcut으로 만들 수 있다.  
+* pointcut에 대한 표현식을 값으로 가짐
+* @Pointcut이 적용된 메소드는 무조건 리턴타입이 void
+
+### 포인트 컷 표현식
+![image](https://user-images.githubusercontent.com/67637716/155667739-1c0ec19a-a90f-40b1-9dfd-e4c3fa3ec9ef.png)
+
+1. 포인트 컷의 지정자   
+포인트 컷의 표현식은 항상 특정 지정자를 선언하여 시작한다.  
+* @Pointcut(execution(...))
+* @Pointcut(@annotation(...))
+우리가 사용하고 있는 execution이나 @annotation 지정자를 PointCut Designator이라하며 "PCD"라 불리고 있다.  
+PCD는 타깃의 여러 조인 포인트 중에 어드바이스를 어디에 적용을 시킬지 AOP에게 알려주는 키워드이다.  
+
+1-1. execution -기본적인 PCD
+``` java
+@Pointcut(
+          "execution("    // PCD execution 지정
+        + "[접근제한자 패턴] "  // public
+        + "리턴타입 패턴"       // long
+        + "[패키지명, 클래스 경로 패턴]"          // com.moong.ahea.UserService
+        + "메소드명 패턴(파라미터 타입 패턴|..)"  // .findUserId(String)
+        + "[throws 예외 타입 패턴]"             // throws RuntimeException
+        +")"   
+          )
+```
+[]은 생략이 가능한 옵션을 의미하고 |는 OR조건을 의미.  
+``` java
+// 모든 패키지에 포함된 클래스 중에, 클래스 이름이 Service로 끝나는 클래스
+@Pointcut("execution( * *..*Service.findUserId(..) )")
+
+// 최소한의 필수 규칙들 → 리턴타입 메소드명(파라미터)
+@Pointcut("execution( * findUserId(..) )")
+
+// find로 시작하는 메소드
+@Pointcut("execution( * find*(..) )")
+```  
+
+1-2. within -패키지, 클래스를 제한하자
+execution과 비슷하지만, within은 메소드가 아닌 특정 타입에 속한 메소드를 포인트 컷으로 설정할 때 사용.  
+``` java
+// UserService안에 있는 모든 메소드에 어드바이스 주입
+@Pointcut("within(com.moong.ahea.UserService)")
+```
+
+1-3. this와 target -생성된 Proxy에 대한 PCD
+* this -> CGLIB
+* target -> JDK Dynamic Proxy
+this는 Proxy에 대한 조인 포인트이고, target은 타깃에 대한 조인 포인트를 사용할 수 있다.  
+this는 CGLIB방식으로 생성된 Proxy일때 사용되고, target은 JDK Dynamic Proxy로 Proxy가 생성될 때 사용.  
+
+ex) 
+``` java
+class UserService implements DefaultService{
+  ...
+}
+
+// UserService는 인터페이스를 상속받기 때문에 JDK DynamicProxy를 사용하여 Proxy bean 생성, target PCD 사용
+@Pointcut("target(com.moong.ahea.UserService)")
+```
+
+1-4. args -파라미터 값이 궁금하다면?
+
 
