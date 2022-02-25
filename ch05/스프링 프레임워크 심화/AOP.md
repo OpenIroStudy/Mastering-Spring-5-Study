@@ -301,6 +301,6 @@ class UserService implements DefaultService{
 AspectJ는 메서드 호출을 위한 여러 가지 인터셉션 포인트를 제공한다.  
 * @Before : 메서드를 실행하기 전
 * @After : 메서드 실행 후. 메서드가 예외를 발생시키더라도 실행
-* @AfterReturning : 메서드가 성공적으로 실행된 후
+* @AfterReturning : 메서드가 성공적으로 실행된 후, 메소드 반환값 획득 가능
 * @AfterThrowing : 메서드 호출 후 예외가 발생했을 시
-* @Around : 메서드 실행을 완전히 제어.
+* @Around : 메소드 호출 자체를 가로채서 비즈니스 메소드 실행 전&후 모두에 처리할 로직을 삽입할 수 있음.
