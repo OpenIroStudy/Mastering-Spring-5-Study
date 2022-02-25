@@ -58,7 +58,7 @@ Spring AOP에서 사용되는 Proxy는 2가지가 있다.
 * JDK Dynamic Proxy - java library에서 제공  
 * CGLIB Proxy - CGLIB library 추가해야함  
 
-# AOP 동작 
+# AOP 동작 원리
 ### Proxy란?
 ![image](https://user-images.githubusercontent.com/67637716/155658414-bd181dea-7863-4f1f-a7d5-8d3614a03718.png)
 > Proxy란 마치 자신이 클라이언트가 사용하려고 하는 실제 대상인 것처럼 위장해서 클라이언트의 요청을 받아주는 것을 대리자, 대리인과 같은 역할을 하는 객체의 의미한다.
