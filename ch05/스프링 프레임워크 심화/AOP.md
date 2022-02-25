@@ -201,6 +201,28 @@ Aspect로 이용하기 위해서는 bean으로 등록해야한다.
 public class TimeCheckAspect {}
 ```
 
+2. PointCut 선언
+Aspect를 선언했으니 어떤 joinPoint에서 advice를 실행 시킬 것인지 PointCut을 선언해야함.  
+``` java
+@Pointcut("execution(public * personal.ykh.sample.target.*.*(..))")
+private void timeCheckPointCut() {}
+```
+
+3. Advice 구성하기
+target method를 실행하는 부분은 joinPoint.proceed()이다.  
+``` java
+// pointcut 메서드와 advice 메서드를 합쳐 한번에 표현할 수 있다.
+// @Around("personal.ykh.sample.TimeCheckAspect.timeCheckPointCut()")
+@Around(pointcut = "execution(public * personal.ykh.sample.target.*.*(..))")
+spublic Object timeCheck(ProceedingJoinPoint joinPoint) throws Throwable {
+    Stopwatch stopwatch = Stopwatch.createStarted();
+    Object proceed = joinPoint.proceed();
+    stopwatch.stop();
+    System.out.println("time : " + stopwatch.elapsed(TimeUnit.MILLISECONDS) + "ms");
+    return proceed;
+}
+```
+
 ## Annotations
 ### @Pointcut
 포인트 컷이란 메소드의 Joinpoint에 대한 Advice가 언제 실행될 지를 지정하는데 사용한다.  
@@ -266,5 +288,10 @@ class UserService implements DefaultService{
 ```
 
 1-4. args -파라미터 값이 궁금하다면?
+타깃의 메소드 호출에서 사용되는 전달받은 파라미터 값이 궁금하다면 args PCD를 사용하면 됨.  
 
+1-5. @annotation -해당 어노테이션 지정
+``` java
+@Around("@annotation(kr.co.openlabs.mtf.client.aop.GlobalTransaction)")
+```
 
