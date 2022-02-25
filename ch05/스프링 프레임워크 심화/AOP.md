@@ -58,6 +58,7 @@ Spring AOP에서 사용되는 Proxy는 2가지가 있다.
 * JDK Dynamic Proxy - java library에서 제공  
 * CGLIB Proxy - CGLIB library 추가해야함  
 
+# AOP 
 ### Proxy란?
 ![image](https://user-images.githubusercontent.com/67637716/155658414-bd181dea-7863-4f1f-a7d5-8d3614a03718.png)
 > Proxy란 마치 자신이 클라이언트가 사용하려고 하는 실제 대상인 것처럼 위장해서 클라이언트의 요청을 받아주는 것을 대리자, 대리인과 같은 역할을 하는 객체의 의미한다.
@@ -159,14 +160,16 @@ Enhancer클래스 바탕으로 Target Class를 상속받아 생성
         assertThat(proxiedCar.stop("huisam")).isEqualTo("Car huisam stopped!");
 ```
 
-> 정리 ::
-> CGLIB Proxy는 Enhancer라는 클래스를 바탕으로 Proxy를 생성 -> SuperClass 클래스 반드시 지정.
-> CGLIB은 Byte코드를 조작해서 바이너리가 만들어지기 때문에 JDK Dynamic Proxy보다 성능적으로 우세.
-> 다만, final 객체 또는 private 접근자로 된 메서드는 상속이 지원되지 않기 때문에 제약적인 Proxy구현.
+> CGLIB Proxy는 Enhancer라는 클래스를 바탕으로 Proxy를 생성 -> SuperClass 클래스 반드시 지정.  
+> CGLIB은 Byte코드를 조작해서 바이너리가 만들어지기 때문에 JDK Dynamic Proxy보다 성능적으로 우세.  
+> 다만, final 객체 또는 private 접근자로 된 메서드는 상속이 지원되지 않기 때문에 제약적인 Proxy구현.  
 
-> InvocationHandler, MethodInterceptor 는 Spring AOP에서 JoinPoint
-> MethodMatcher는 Spring AOP에서 PointCut
-> invoke, Intercept 메서드는 Spring AOP에서 Advice개념과 일치.
+> InvocationHandler, MethodInterceptor 는 Spring AOP에서 JoinPoint  
+> MethodMatcher는 Spring AOP에서 PointCut  
+> invoke, Intercept 메서드는 Spring AOP에서 Advice개념과 일치.  
 
-내부적으로는 이렇게 돌아가지만 실제 현업에서는 어노테이션으로 편하게 AOP 지원.  
-
+### 정리
+* 내부적으로는 이렇게 돌아가지만 실제 현업에서는 어노테이션으로 편하게 AOP 지원.  
+* Spring AOP는 Proxy를 기반으로 한 Runtime Weaving 방식이다.
+* Spring AOP에서는 JDK Dynamic Proxy 와 CGlib 을 통해 Proxy화 한다.
+* JDK Dynamic Proxy는 Reflection을 기반으로 이루어지고 CGlib 은 상속을 기반으로 이루어진다.
