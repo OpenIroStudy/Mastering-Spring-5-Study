@@ -28,6 +28,7 @@ AOP의 기본 개념은 핵심 기능에 공통 기능을 삽입하는 것.
 <br>
 
 ## 중요한 AOP 용어
+![image](https://user-images.githubusercontent.com/67637716/155653099-182ac2e9-40d8-4954-b414-c2ad042a72b3.png)  
 * 핵심관심사항
   * 핵심 비지니스 로직을 다루는 관심 사항이다.
 * 공통관심사항
