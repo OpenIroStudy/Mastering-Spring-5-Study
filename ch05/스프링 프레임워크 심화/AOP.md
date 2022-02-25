@@ -54,6 +54,7 @@ AOP의 기본 개념은 핵심 기능에 공통 기능을 삽입하는 것.
 <br>
 Spring AOP는 런타임 시 Proxy를 이용하여 횡단 로직을 수행 할 수 있도록 한다.  
 Spring AOP에서 사용되는 Proxy는 2가지가 있다.  
+
 * JDK Dynamic Proxy - java library에서 제공  
 * CGLIB Proxy - CGLIB library 추가해야함  
 
