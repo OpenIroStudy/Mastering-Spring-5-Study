@@ -116,4 +116,37 @@ JPA에서 객체 그래프 탐색을 하는 것처럼 API 그래프 탐색이 �
 ## REST API 설계
 <img width="505" alt="RESTmethod" src="https://user-images.githubusercontent.com/82895809/156339970-f980bbe7-e2e8-45e6-8afc-3e9f71caeec4.png">
 
-* GET : 읽기 - 리소스의 
+* GET : 읽기 - 리소스의 세부 정보 검색
+* POST : 생성 - 새로운 아이템 또는 리소스 생성
+* PUT : 업데이트/교체
+* PATCH : 리소스 일부 업데이트/수정
+* DELETE : 삭제
+
+## REST API의 예외 처리
+REST 서비스에서 중점을 두어야 할 중요한 사항 중 하나는 오류 응답의 응답 상태다.
+
+* 400 BAD REQUEST : 요청 본문이 API 스펙을 충족하지 않는다. 세부사항이 충분하지 않거나 유효성 검사 오류가 있다.
+* 401 UNAUTHORIZED : 인증 또는 권한 부여에 실패했다.
+* 403 FORBIDDEN : 사용자는 제한을 초과하는 등 다양한 요인으로 인해 작업을 수행할 수 없다.
+* 404 NOT FOUND : 리소스가 없다.
+* 405 METHOD NOT ALLOWED : 지원되지 않는 작업(예: GET만 허용되는 리소스에서 POST를 시도하는 경우)
+* 500 INTERNAL SERVER ERROR : 서버에서 오류가 발생했다. 이상적으로는 이런 일이 발생하지 않아야 한다. 소비자는 문제를 해결할 수 없다.
+
+## 스프링 부트 스타터 HATEOAS
+```
+<dependency>
+ <groupId>org.springframework.boot</groupId>
+ <artifactId>spring-boot-starter-hateoas</artifactId>
+</dependency>
+
+<dependency>
+ <groupId>org.springframework.hateoas</groupId>
+ <artifactId>spring-hateoas</artifactId>
+</dependency>
+```
+
+## REST API의 유효성 검사 구현하기
+### 컨트롤러 메소드에서 유효성 검사
+@Valid 어노테이션은 유효성 검사를 위한 매개변수를 표시하는 데 사용된다. 
+
+메소드가 실행되기 전에 빈에 정의된 모든 유효성 검사가 실행된다.
