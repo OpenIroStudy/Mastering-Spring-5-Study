@@ -199,9 +199,85 @@ public class SwaggerConfig {
 * E-Tag : 메세지에 담겨있는 엔티티를 위한 엔티티 태그를 제공. 이를 활용하여 리소스를 식별할 수 있다.
 * Last-Modified : 엔티티가 마지막으로 변경된 시각에 대한 정보를 제공(파일인 경우 파일 시스템이 제공해 준 최근 변경 시각, 동적으로 생성된 리소스라면 응답이 만들어진 시간)
 
-## 웹 관련 어노테이션
-* @RequestParam은 1개의 HTTP 요청 파라미터를 받기 위해서 사용한다. 반드시 필요한 변수가 아니라면 required의 값을 false로 설정해둘 수 있다.
+## 웹 관련 용어
+* @RequestParam
+  * 1개의 HTTP 요청 파라미터를 받기 위해서 사용한다. 반드시 필요한 변수가 아니라면 required의 값을 false로 설정해둘 수 있다.
 
-* @RequestBody는 클라이언트가 전송하는 Json형태의 HTTP Body내용을 Java Object로 변환시켜주는 역할을 한다. 그렇기 때문에 Body가 존재하지 않는 HTTP Get메소드에 활용하려고 한다면 에러가 발생.
+* @PathVariable
+  * REST API에서 값을 호출할 때 주로 많이 사용한다.
 
-* @ModelAttribute는 클라이언트가 전송하는 multipart/form-data형태의 HTTP Body내용과 HTTP 파라미터의 값들을 생성자나 Setter를 통해 주입하기 위해 사용. 매핑시키는 파라미터의 타입이 객체의 타입과 일치하는지를 포함한 다양한 검증(Validiation)작업이 추가적으로 진행. int형 변수에 String형을 넣으면 BindException이 발생 
+----------------------
+Type 1 = http://127.0.0.1?index=1&page=2
+Type 2 = http://127.0.0.1/index/1
+
+Type 1의 URL을 처리할 때 @RequestParam을 사용한다.
+
+@GetMapping("read")
+public ModelAndView getFactoryRead(@RequestParam("no") int factroyId, SearchCriteria criteria) 
+{
+  //...    
+}
+
+@PostMapping("delete/{idx}")
+@ResponseBody
+public JsonResultVo postDeleteFactory(@PathVariable("idx") int factoryIdx) {
+	return factoryService.deleteFacotryData(factoryIdx);
+}
+
+복합적으로 사용도 가능하다.
+@GetMapping("/user/{userIdx}/invoices")
+public List<Invoice> listUsersInvoices(
+	 @PathVariable("userIdx") int user,
+	 @RequestParam(value = "date", required = false) Date dateOrNull
+)	
+{//...}
+--------------------
+
+* @RequestBody
+  * 클라이언트가 전송하는 Json형태의 HTTP Body내용을 Java Object로 변환시켜주는 역할을 한다. 그렇기 때문에 Body가 존재하지 않는 HTTP Get메소드에 활용하려고 한다면 에러가 발생.
+
+* @ResponseBody
+  * 자바 객체를 HTTP 요청의 Body내용으로 매핑하여 클라이언트로 전송한다. 즉, HTTP 요청 Body를 자바 객체로 전달받을 수 있다.
+
+* @ModelAttribute
+  * 클라이언트가 전송하는 multipart/form-data형태의 HTTP Body내용과 HTTP 파라미터의 값들을 생성자나 Setter를 통해 주입하기 위해 사용. 매핑시키는 파라미터의 타입이 객체의 타입과 일치하는지를 포함한 다양한 검증(Validiation)작업이 추가적으로 진행. int형 변수에 String형을 넣으면 BindException이 발생 
+
+* ResponseEntity?
+  * ResContorller는 별도의 View를 제공하지 않는 형태로 서비스를 실행한다. 때문에 결과데이터가 예외적인 상황에서 문제가 발생할 수 있다.
+  * ResponseEntity는 개발자가 직접 결과 데이터와 HTTP 상태 코드를 직접 제어할 수 있는 클래스로 개발자는 404나 500 ERROR와 같은 HTTP 상태 코드를 전송하고 싶은 데이터와 함께 전송할 수 있기 때문에 좀 더 세밀한 제어가 필요한 경우 사용한다.
+```
+@Data
+@Entity
+@Table(name = "student_TBL")
+@AllArgsConstructor
+@NoArgsConstructor
+public class Student {
+    @Id
+    @GeneratedValue
+    private Long id;
+    private String studentName;
+    private int score;
+}
+
+//////////////////////////////////////////////////////////
+
+// ResponseEntity : 데이터 + HTTP status code
+
+@RestController
+@RequestMapping("/api/student")
+public class StudentRestController {
+    @Autowired
+    StudentService studentService;
+    
+    @PostMapping("test")
+    ResponseEntity<Student> postStudent(@RequestBody Student student, UriComponentsBuilder uriBuilder){
+        Student created = studentService.createOrUpdate(student);
+        URI location = uriBuilder.path("api/student/test/{id}").buildAndExpand(created.getId()).toUri();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(location);
+        
+        // return 할 때 data와 HTTP 상태메시지를 함께 전송
+        return new ResponseEntity<>(created, headers, HttpStatus.CREATED);
+    }
+   
+```
