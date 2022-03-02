@@ -40,7 +40,7 @@ REST(Representational State Transfer)는 효율적, 안정적이며 확장가능
 3. Self-Descriptive Message
 4. **H**ypermedia **A**s **T**he **E**ngine **o**f **A**pplication **S**tate
 
-1번과 2번을 합쳐서 한 문장으로 하면 **URI로 지정한 리소스를 Http Method를 통해서 표한하고 구분한다.**이다.
+1번과 2번을 합쳐서 한 문장으로 하면 **URI로 지정한 리소스를 Http Method를 통해서 표한하고 구분한다.** 이다.
 
 ```
 https://my-server.com/page?user=guest/menu=login
