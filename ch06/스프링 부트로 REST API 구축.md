@@ -27,4 +27,15 @@ REST(Representational State Transfer)는 효율적, 안정적이며 확장가능
   * 보통 HTTP Header에 Cache-Control헤더를 이용한다.
 
 * Layer System
-*  * Client는 Server와 직접 연결돼서는 안 된다. 요청을 캐시할 수 있으므로 Client는 중간 레이어에서 캐시된 응답을 가져올 수 있다.
+  * Client는 Server와 직접 연결돼서는 안 된다. 요청을 캐시할 수 있으므로 Client는 중간 레이어에서 캐시된 응답을 가져올 수 있다.
+
+* Uniform Interface
+
+* HATEOAS
+
+
+### Uniform Interface의 4가지 제약 조건
+1. Resource-Based
+2. Manipluation Of Resources Through Representations
+3. Self-Descriptive Message
+4. *H*ypermedia As The Engine of Application State
