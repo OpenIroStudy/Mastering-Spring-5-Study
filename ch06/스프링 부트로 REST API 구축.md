@@ -211,26 +211,30 @@ Type 1 = http://127.0.0.1?index=1&page=2
 Type 2 = http://127.0.0.1/index/1
 
 Type 1의 URL을 처리할 때 @RequestParam을 사용한다.
-
+```
 @GetMapping("read")
 public ModelAndView getFactoryRead(@RequestParam("no") int factroyId, SearchCriteria criteria) 
 {
   //...    
 }
-
+```
+```
 @PostMapping("delete/{idx}")
 @ResponseBody
 public JsonResultVo postDeleteFactory(@PathVariable("idx") int factoryIdx) {
 	return factoryService.deleteFacotryData(factoryIdx);
 }
+```
 
 복합적으로 사용도 가능하다.
+```
 @GetMapping("/user/{userIdx}/invoices")
 public List<Invoice> listUsersInvoices(
 	 @PathVariable("userIdx") int user,
 	 @RequestParam(value = "date", required = false) Date dateOrNull
 )	
 {//...}
+```
 --------------------
 
 * @RequestBody
