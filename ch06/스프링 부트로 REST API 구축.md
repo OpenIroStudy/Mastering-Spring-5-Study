@@ -150,3 +150,58 @@ REST 서비스에서 중점을 두어야 할 중요한 사항 중 하나는 오�
 @Valid 어노테이션은 유효성 검사를 위한 매개변수를 표시하는 데 사용된다. 
 
 메소드가 실행되기 전에 빈에 정의된 모든 유효성 검사가 실행된다.
+
+## OpenAPI 스펙을 사용한 REST 서비스 문서화
+Springfox 스웨거를 사용하면 RESTful 서비스 코드에서 스웨거 문서를 생성할 수 있다. 
+
+또한 스웨거 UI라는 도구는 애플리케이션에 통합돼 사람이 읽을 수 있는 문서를 제공한다.
+
+```
+<dependency>
+ <groupId>io.springfox</groupId>
+ <artifactId>springfox-swagger2</artifactId>
+ <version>2.4.0</version>
+</dependency>
+
+<dependency>
+ <groupId>io.springfox</groupId>
+ <artifactId>springfox-swagger-ui</artifactId>
+ <version>2.4.0</version>
+</dependency>
+```
+
+```
+@Configuration
+@EnableSwagger2
+public class SwaggerConfig {
+    @Bean
+    public Docket api() {
+        return new Docket(DocumentationType.SWAGGER_2).select()
+            .apis(RequestHandlerSelectors.any())
+            .paths(PathSelectors.any())
+            .build();
+    }
+}
+```
+
+## REST API 캐싱
+서비스의 데이터 캐싱은 애플리케이션의 성능과 확장성을 향상시키는 데 중요한 역할을 한다.
+
+* 캐시란?
+  * 웹 캐시는 자주 쓰이는 문서의 사본을 자동으로 보관하는 HTTP장치이다. 웹요청이 캐시에 도착했을 때, 태시된 로컬 사본이 존재한다면, 그 문서는 원 서버가 아니라 그 캐시로 부터 제공된다.
+
+* 캐시의 이점
+  * 불필요한 데이터 전송을 줄여서, 네트워크 요금으로 인한 비용을 줄여 준다.
+  * 네트워크 병목을 줄여준다. 대역폭을 늘리지 않고도 페이지를 빨리 불어로 수 있게 된다.
+  * 원 서버에 대한 요청을 줄여준다. 서버는 부하를 줄일 수 있으며 더 빨리 응답할 수 있게 된다.
+  * 페이지를 먼 곳에서 불러올수록 시간이 많이 걸리는데, 캐시는 거리로 인한 지연을 줄여준다.
+
+* E-Tag : 메세지에 담겨있는 엔티티를 위한 엔티티 태그를 제공. 이를 활용하여 리소스를 식별할 수 있다.
+* Last-Modified : 엔티티가 마지막으로 변경된 시각에 대한 정보를 제공(파일인 경우 파일 시스템이 제공해 준 최근 변경 시각, 동적으로 생성된 리소스라면 응답이 만들어진 시간)
+
+## 웹 관련 어노테이션
+* @RequestParam은 1개의 HTTP 요청 파라미터를 받기 위해서 사용한다. 반드시 필요한 변수가 아니라면 required의 값을 false로 설정해둘 수 있다.
+
+* @RequestBody는 클라이언트가 전송하는 Json형태의 HTTP Body내용을 Java Object로 변환시켜주는 역할을 한다. 그렇기 때문에 Body가 존재하지 않는 HTTP Get메소드에 활용하려고 한다면 에러가 발생.
+
+* @ModelAttribute는 클라이언트가 전송하는 multipart/form-data형태의 HTTP Body내용과 HTTP 파라미터의 값들을 생성자나 Setter를 통해 주입하기 위해 사용. 매핑시키는 파라미터의 타입이 객체의 타입과 일치하는지를 포함한 다양한 검증(Validiation)작업이 추가적으로 진행. int형 변수에 String형을 넣으면 BindException이 발생 
