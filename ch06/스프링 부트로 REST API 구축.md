@@ -208,6 +208,7 @@ public class SwaggerConfig {
 
 ----------------------
 Type 1 = http://127.0.0.1?index=1&page=2
+
 Type 2 = http://127.0.0.1/index/1
 
 Type 1의 URL을 처리할 때 @RequestParam을 사용한다.
@@ -218,6 +219,8 @@ public ModelAndView getFactoryRead(@RequestParam("no") int factroyId, SearchCrit
   //...    
 }
 ```
+
+Type 2의 URL을 처리할 때는 @PathVariable을 사용한다.
 ```
 @PostMapping("delete/{idx}")
 @ResponseBody
