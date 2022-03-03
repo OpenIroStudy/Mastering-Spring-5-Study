@@ -75,6 +75,7 @@ API 문서 전체를 응답에 넣는 것은 불가능 하지만 적어도 API �
 #### HATEOAS(Hypermedia As The Engine of Application State)
 HATEOAS를 한 줄로 표현하면 Hypermedia(링크)를 통해서 애플리케이션의 상태 전이가 가능해야 한다.
 또한 Hypermedia(링크)에 자기 자신에 대한 정보가 담겨야 한다.
+
 <img width="574" alt="hateoas" src="https://user-images.githubusercontent.com/82895809/156522492-189dda57-c6d9-409f-9b5e-7621de16328d.png">
 
 위는 웹 서비스들이 RESTful한 구현 결과를 향해 나아가는 그림이다.
@@ -119,6 +120,29 @@ GET https://my-server.com/article
 JPA에서 객체 그래프 탐색을 하는 것처럼 API 그래프 탐색이 가능해진다.
 
 그럼 링크에 대한 정보가 바뀌더라도 클라이언트에선 일일이 대응하지 않아도 된다.
+
+예시 코드
+```
+    @GetMapping
+    List<Student> getListStudent() {
+        return studentService.findAll();
+    }
+
+    @GetMapping("/test/{id}")
+    public EntityModel<Student> hateoasTest(@PathVariable Long id) {
+        Student student = studentService.findOne(id);
+
+        EntityModel<Student> model = EntityModel.of(student);
+        WebMvcLinkBuilder linkTo = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(this.getClass())
+            .getListStudent());
+
+        model.add(linkTo.withRel("all-students"));
+        return model;
+    }
+```
+
+<img width="424" alt="성공" src="https://user-images.githubusercontent.com/82895809/156531241-27fd252b-38f2-436f-9176-175123c4b18a.png">
+
 
 ## REST API 설계
 <img width="505" alt="RESTmethod" src="https://user-images.githubusercontent.com/82895809/156339970-f980bbe7-e2e8-45e6-8afc-3e9f71caeec4.png">
