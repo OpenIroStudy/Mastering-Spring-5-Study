@@ -75,6 +75,13 @@ API 문서 전체를 응답에 넣는 것은 불가능 하지만 적어도 API �
 #### HATEOAS(Hypermedia As The Engine of Application State)
 HATEOAS를 한 줄로 표현하면 Hypermedia(링크)를 통해서 애플리케이션의 상태 전이가 가능해야 한다.
 또한 Hypermedia(링크)에 자기 자신에 대한 정보가 담겨야 한다.
+<img width="574" alt="hateoas" src="https://user-images.githubusercontent.com/82895809/156522492-189dda57-c6d9-409f-9b5e-7621de16328d.png">
+
+위는 웹 서비스들이 RESTful한 구현 결과를 향해 나아가는 그림이다.
+
+이처럼 RESTful API를 사용하는 클라이언트가 전적으로 서버와 동적인 상호작용이 가능하도록 하는 것을 HATEOAS라고 부른다.
+
+이러한 방법은 클라이언트가 서버로부터 어떠한 요처을 할 때, 요청에 필요한(의존되는) URI를 응답에 포함시켜 반환하는 것으로 가능하게 할 수 있다.
 
 ```
 GET https://my-server.com/article
