@@ -40,7 +40,7 @@ REST API를 빌드할 때 고려해야 할 가장 중요한 기능은 인증 및
 
 ```
 
-secure = false 매개변수로 단위 테스트의 스프링 시큐리티르 비활성화한다.
+secure = false 매개변수로 단위 테스트의 스프링 시큐리티를 비활성화한다.
 
 #### @WebMvcTest
 ------------------
@@ -53,4 +53,4 @@ Service, Repository dependency가 필요한 경우에는 @MockBean으로 주입�
 
 ------------------
 
-
+## 스프링 
