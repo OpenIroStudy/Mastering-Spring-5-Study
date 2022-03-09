@@ -17,12 +17,12 @@ REST API를 빌드할 때 고려해야 할 가장 중요한 기능은 인증 및
 3. REST API요청이 실행된다.
 
 ## 스프링 시큐리티 스타터
-'''
+```
 <dependency>
   <groupId>org.springframework.boot</groupId>
   <artifactId>spring-boot-starter-security</artifactId>
 </dependency>
-'''
+```
 
 * 스프링 부트 스타터 시큐리티 자동 설정
 <img width="866" alt="스크린샷 2022-03-09 오후 9 28 58" src="https://user-images.githubusercontent.com/82895809/157442016-aacaf217-927c-4957-8229-c0c6ee1202be.png">
@@ -34,9 +34,13 @@ REST API를 빌드할 때 고려해야 할 가장 중요한 기능은 인증 및
 기본 자동 구성 사용자 ID는 user이며 기본 시크릿번호는 서버 시작 시 로그에 프린트된다.
 
 * 시큐리티르 비활성호하기 위해 단위 테스트 업데이트하기
-'''
+```
+
 @WebMvcTest(value = XXX.class, secure = false)
-'''
+
+```
+
+secure = false 매개변수로 단위 테스트의 스프링 시큐리티르 비활성화한다.
 
 #### @WebMvcTest
 ------------------
@@ -48,4 +52,5 @@ Service, Repository dependency가 필요한 경우에는 @MockBean으로 주입�
 @SpringBootTest의 경우 모든 빈을 로드하기 때문에 테스트 구동 시간이 오래 걸리고, 테스트 단위가 크기 때문에 디버깅이 어려울 수 있다. Controller 레이어만 슬라이스 테스트 하고 싶을 때에는 @WebMvcTest를 쓰는게 유용하다.
 
 ------------------
+
 
