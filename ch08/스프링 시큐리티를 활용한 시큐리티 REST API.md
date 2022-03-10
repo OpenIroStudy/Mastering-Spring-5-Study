@@ -129,5 +129,5 @@ Token이 클라이언트로 부터 서버로 요청이 감 -> 서버는 토큰�
 구글 로그인, 페이스북 로그인, 깃헙 로그인 등이 사용하는 인증절차를 OAuth라고 한다.
 
 ### OAuth 인증절차
-<img width="700" alt="Oauth인증절차1" src="https://user-images.githubusercontent.com/82895809/157562677-0ce0f359-d27f-4f82-9ff6-99666557b30e.png">
+<img width="900" alt="Oauth인증절차1" src="https://user-images.githubusercontent.com/82895809/157562677-0ce0f359-d27f-4f82-9ff6-99666557b30e.png">
 <img width="700" alt="Oauth인증절차2" src="https://user-images.githubusercontent.com/82895809/157562740-916a33fa-2746-4db3-806b-9c2936820517.png">
