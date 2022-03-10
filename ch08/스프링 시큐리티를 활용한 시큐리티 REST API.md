@@ -63,4 +63,71 @@ Service, Repository dependency가 필요한 경우에는 @MockBean으로 주입�
 스프링 시큐리티 필터 체인은 모든 요청에서 인증 및 권한 부여를 체크한다. 요청에 적절한 자격 증명이나 권한이 없으며 요청이 거부되고 오류가 발생한다.
 
 ## 스프링 시큐리티의 인증
-인증 필터는 일반적으로 인증 매니저에게 위임되는 것을
+인증 필터는 일반적으로 인증 매니저에게 위임되는 것을 확인 가능하다.
+
+AuthenticationManager(ProviderManager)는 여러 AuthenticationProvider와 통신한다.
+
+AuthenticationManager는 interface다.
+
+ProviderManager는 AuthenticationManager interface의 구현체 클래스이다.
+
+## WebSecurity
+인증 및 권한이 필요 없는 URL을 구성하기 위해 configure를 override해서 특정 요청에 대해서는 시큐리티 설정을 무시하도록 하는 등 전체에 관한 설정을 한다.
+
+대부분의 웹 경로를 다 보안으로 제어를 하는데 정적 리소스에 대해서는 무시하라고 ignoring()에 매칭 표현식을 추가해준다.
+
+## HttpSecurity
+스프링 시큐리티의 각종 설정은 HttpSecurity로 대부분 하게 된다.
+
+```
+    /**
+     * 스프링시큐리티 앞단 설정들을 할 수 있다.
+     */
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+        // resources 모든 접근을 허용하는 설정을 해버리면
+        // HttpSecurity 설정한 ADIM권한을 가진 사용자만 resources 접근가능한 설정을 무시해버린다.
+        web.ignoring()
+                .antMatchers("/resources/**");
+    }
+
+    /**
+     * 스프링시큐리티의 설정을 할 수 있다.
+     */
+    @Override
+    public void configure(HttpSecurity http) throws Exception {
+        // WebSecurity에 접근 허용 설정을 해버리면 이 설정이 적용되지 않는다.
+        http.authorizeRequests()
+                .antMatchers("/resources/**").hasRole("ADIM") // no effect
+                .anyRequest().authenticated();
+    }
+```
+
+---------------------
+
+스프링 시큐리티의 각종 설정은 HttpSecuriy로 한다. WebSecurity 스프링 시큐리티 앞단의 설정들을 하는 객체이므로 HttpSecurity 설정한 스프링 시큐리티 설정이 override 되는 설정이 있는 경우도 있다.
+
+---------------------
+
+## 인증(Authentication)과 인가(Authorization)
+* 인증 : 보호된 리소스에 접근하는 것을 허용하기 이전에 등록된 유저의 신원을 입증(validating)하는 과정.
+* 인가 : 요청된 리소스에 접근할 수 있는 권한이 있는 인증된(Authenticated) 유저인지 입증(validating)하는 과정.
+
+1. 인증하기 (Request Header) - 매번 인증해야 한다.
+2. 인증 유지하기 (Browser) - 로컬, 쿠키 등에 사용자의 정보를 저장.
+3. 안전하게 인증하기 (Server) - Session 활용. 클라이언트에서 사용자의 raw한 데이터를 가지고 있지 않아 해킹에 대해 큰 위험은 없다. 만료기간 설정 가능.
+서버가 많아질 경우(로드 밸런스가 있을 경우) 세션 DB를 만들어 세션을 따로 저장. 하지만 클라이언트가 많아질 경우 DB 과부하.
+4. 효율적으로 인증하기 (Token) - 정보의 요청과 응답안에 사용자의 state를 담는 것이 Token을 활용한 인증 방법.
+JWT (Json Web Token) : JWT는 해독하기 쉬워서 민감한 정보(비밀번호)를 담지 않는다. 시크릿 키를 사용해 JWT를 만들어 내고 시크릿 키를 사용해서 JWT의 인증과정을 거침.
+Token이 클라이언트로 부터 서버로 요청이 감 -> 서버는 토큰의 유효성 검사를 본인이 가진 시크릿 키로 진행 -> 유효하지 않다면 버리고 유효하다면 사용자 정보 파악
+토큰으로 상태관리를 하기에 따로 세션을 둘 필요가 없다.
+5. 다른 채널을 통해 인증하기 (OAuth)
+
+## OAuth
+### OAuth란?
+다른 웹사이트 상의 자신들의 정보에 대해 접근 권한을 부여할 수 있는 공통적인 수단이자 개방형 표준.
+구글 로그인, 페이스북 로그인, 깃헙 로그인 등이 사용하는 인증절차를 OAuth라고 한다.
+
+### OAuth 인증절차
+<img width="700" alt="Oauth인증절차1" src="https://user-images.githubusercontent.com/82895809/157562677-0ce0f359-d27f-4f82-9ff6-99666557b30e.png">
+<img width="700" alt="Oauth인증절차2" src="https://user-images.githubusercontent.com/82895809/157562740-916a33fa-2746-4db3-806b-9c2936820517.png">
