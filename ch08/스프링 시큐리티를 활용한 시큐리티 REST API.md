@@ -65,11 +65,23 @@ Service, Repository dependency가 필요한 경우에는 @MockBean으로 주입�
 ## 스프링 시큐리티의 인증
 인증 필터는 일반적으로 인증 매니저에게 위임되는 것을 확인 가능하다.
 
-AuthenticationManager(ProviderManager)는 여러 AuthenticationProvider와 통신한다.
+![authenticationarchitecture](https://user-images.githubusercontent.com/82895809/157607585-1bc03461-b06f-4fec-988d-939a0aefeea7.png)
 
-AuthenticationManager는 interface다.
+* AuthenticationManager
+  * AuthenticationFilter에 의해 AuthenticationManager가 동작한다.
+  * 인증을 처리하면 SecurityContextHolder에 Authentication 값이 세팅된다.
 
-ProviderManager는 AuthenticationManager interface의 구현체 클래스이다.
+* ProviderManager
+  * ProviderManager는 인증을 직접 처리하는 것이 아닌 다른 여러 Provider를 사용해서 진행한다.
+  * AuthenticationManager interface의 구현체 클래스이다.
+  * 다른 여러 Provider들에게 위임하는 구조
+  * 현재 파라미터로 들어온 Authentication 객체는 UsernameAuthenticatnioToken 타입이다.
+
+* AuthenticationProvider
+  * 각각의 AuthenticationProvider는 특정 유형의 인증을 수행한다.
+
+![authenticationprovider](https://user-images.githubusercontent.com/82895809/157607862-85985262-d445-48f1-8a8f-7cd13fa9be9a.png)
+
 
 ## WebSecurity
 인증 및 권한이 필요 없는 URL을 구성하기 위해 configure를 override해서 특정 요청에 대해서는 시큐리티 설정을 무시하도록 하는 등 전체에 관한 설정을 한다.
@@ -106,6 +118,37 @@ ProviderManager는 AuthenticationManager interface의 구현체 클래스이다.
 ---------------------
 
 스프링 시큐리티의 각종 설정은 HttpSecuriy로 한다. WebSecurity 스프링 시큐리티 앞단의 설정들을 하는 객체이므로 HttpSecurity 설정한 스프링 시큐리티 설정이 override 되는 설정이 있는 경우도 있다.
+
+### ignoring()
+* SpringSecurity에서는 Security FilterChain을 적용하고 싶지 않은 리소스에 대해 설정을 할 수 있도록 ignore를 제공한다. 
+* mvcMatchers, antMatchers, requestMatchers 등 다양한 방법을 제공한다.
+
+### mvcMatchers
+* HTTP Method를 파라미터로 넘겨주면 HTTP Method와 요청 URI를 매핑하고, 넘겨주지 않으면 요청 URI는 HTTP Method를 신경쓰지 않는다.
+
+### antMatchers
+* 제공된 ant패턴과 일치 할 때만 호출되도록 HttpSecurity를 구성할 수 있다.
+* ant패턴이란 
+--------------------
+
+? : 1개의 문자와 매칭 (matches single character)
+
+* : 0개 이상의 문자와 매칭 (mathches zero or more characters)
+
+** : 0개 이상의 디렉토리와 파일 매칭 (matches all files / directories)
+
+mvcMatchers와 차이를 예로 들어보면
+antMatcher("/account") : /account라는 URI가 정확하게 일치하는 경우에만 사용
+mvcMathcer("/account") : /account뿐만 아니라 /account/, /account.html 등을 허용한다.
+
+--------------------
+### regexMatchers
+* 정규 표현식을 이용하여 URI를 매칭하는 방식
+
+### requestMathcers
+* FilterChainProxy에 사용되는 RequestMatcher 전략과 수신 요청을 일치시키도록 정의할 수 있는 Matcher를 주입받을 수 있다.
+
+![스프링시큐리티 메소드](https://user-images.githubusercontent.com/82895809/157612021-0596374f-279c-4eb6-b450-e09678feb78f.png)
 
 ---------------------
 
