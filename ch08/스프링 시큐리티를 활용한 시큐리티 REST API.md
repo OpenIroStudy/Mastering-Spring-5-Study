@@ -129,5 +129,40 @@ Token이 클라이언트로 부터 서버로 요청이 감 -> 서버는 토큰�
 구글 로그인, 페이스북 로그인, 깃헙 로그인 등이 사용하는 인증절차를 OAuth라고 한다.
 
 ### OAuth 인증절차
-<img width="900" alt="Oauth인증절차1" src="https://user-images.githubusercontent.com/82895809/157562677-0ce0f359-d27f-4f82-9ff6-99666557b30e.png">
+<img width="850" alt="Oauth인증절차1" src="https://user-images.githubusercontent.com/82895809/157562677-0ce0f359-d27f-4f82-9ff6-99666557b30e.png">
 <img width="700" alt="Oauth인증절차2" src="https://user-images.githubusercontent.com/82895809/157562740-916a33fa-2746-4db3-806b-9c2936820517.png">
+
+출처 : https://www.youtube.com/watch?v=JZgD8aPkHSc
+
+### 1.0과 2.0의 차이
+<img width="727" alt="OAuth2 0" src="https://user-images.githubusercontent.com/82895809/157563905-bd46f2e6-f22c-4c22-a966-5eb6a43dc467.png">
+
+* 권한 부여 승인 코드 방식 (Authorization Code Grant)
+  * 권한 부여 승인을 위해 자체 생성한 Authorization Code를 전달하는 방식으로 많이 쓰이고 기본이 되는 방식.
+  <img width="540" alt="1" src="https://user-images.githubusercontent.com/82895809/157564389-25d622cd-5740-4fb1-8dbb-fc8d4cf2e2a1.png">
+
+  
+* 암묵적 승인 방식 (Implicit Grant)
+  * 자격증명을 안전하게 저장하기 힘든 클라이언트(ex: JavaScript등의 스크립트 언어를 사용한 언어를 사용한 브라우저)에게 최적화된 방식.
+<img width="501" alt="2" src="https://user-images.githubusercontent.com/82895809/157564396-e352a17d-751b-44a8-b894-3a1ab5537ee5.png">
+
+
+* 자원 소유자 자격증명 승인 방식 (Resouce Owner Password Credentials Grant)
+  * 간단하게 username, password로 Access Token을 받는 방식.
+<img width="501" alt="3" src="https://user-images.githubusercontent.com/82895809/157564406-9ef090cd-1c34-4e24-a454-3736c4c56135.png">
+
+
+* 클라이언트 자격증명 승인 방식 (Client Credentials Grant)
+  * 클라이언트의 자격증명만으로 Access Token을 획득하는 방식.
+<img width="408" alt="4" src="https://user-images.githubusercontent.com/82895809/157564414-8d2d8047-2dd4-4550-a1fb-cd88530cf31f.png">
+
+
+
+### 장점
+* 사용자
+  * 서비스에 ID/PW 를 알려주지 않아도 됨
+  * 원할 때 액세스 토큰의 권한 취소가 가능
+
+* 서비스
+  * 유저의 액세스 토큰만 가지고 있으면 됨
+  * 사용자의 ID/PW 를 몰라도 허가 받은 API 접근 가능
