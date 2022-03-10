@@ -128,18 +128,19 @@ Service, Repository dependency가 필요한 경우에는 @MockBean으로 주입�
 
 ### antMatchers
 * 제공된 ant패턴과 일치 할 때만 호출되도록 HttpSecurity를 구성할 수 있다.
-* ant패턴이란 
+* ant패턴
+
   --------------------
 
-? : 1개의 문자와 매칭 (matches single character)
+  ? : 1개의 문자와 매칭 (matches single character)
 
-* : 0개 이상의 문자와 매칭 (mathches zero or more characters)
+  * : 0개 이상의 문자와 매칭 (mathches zero or more characters)
 
-** : 0개 이상의 디렉토리와 파일 매칭 (matches all files / directories)
+  ** : 0개 이상의 디렉토리와 파일 매칭 (matches all files / directories)
 
-mvcMatchers와 차이를 예로 들어보면
-antMatcher("/account") : /account라는 URI가 정확하게 일치하는 경우에만 사용
-mvcMathcer("/account") : /account뿐만 아니라 /account/, /account.html 등을 허용한다.
+  mvcMatchers와 차이를 예로 들어보면
+  antMatcher("/account") : /account라는 URI가 정확하게 일치하는 경우에만 사용
+  mvcMathcer("/account") : /account뿐만 아니라 /account/, /account.html 등을 허용한다.
 
   --------------------
 ### regexMatchers
