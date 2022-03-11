@@ -144,8 +144,263 @@ Answers.RETURNS_DEFAULTS 은 stub 되지 않은 메소드들에 대해서는 Moc
 * DEFINED_PORT : 포트 번호를 하드 코딩한다는 점을 제외하고는 RAMDOM_PORT와 유사하다.
 * NONE : 웹 컨텍스트 없이 스프링 컨텍스트를 로드한다. 
 
+필자는 원하는 기능을 제공하는 Mock 라이브러리를 찾지 못해 (또는 완전히 학습하지 못해?) 필요한 기능을 제공하는 간단한 라이브러리를 직접 만들어서 사용한 적도 있다. 그런데, 매우 맘에 드는 Mock 라이브러리를 하나 찾게 되었고, 몇 달 정도 사용해 본 결과 이전의 몇몇 Mock 라이브러리도 사용성 면에서 편리하였기에 본 글에서 사용방법을 소개하고자 한다. 그 Mock 라이브러리는 바로 Mockito 라는 것이다.
 
-https://javacan.tistory.com/entry/MocktestUsingMockito 
+Mockito는 http://code.google.com/p/mockito/ 사이트에서 mockito-all-1.6.jar 파일을 다운로드 받을 수 있다. Maven을 사용한다면 아래의 의존을 pom.xml 파일에 추가해주면 된다.
+
+<dependency>
+    <groupId>org.mockito</groupId>
+    <artifactId>mockito-all</artifactId>
+    <version>1.6</version>
+    <scope>test</scope>
+</dependency>
+
+Mock 객체를 만드는 이유가 크게 1) 협업하는 클래스의 완성 여부에 상관없이 내가 만든 클래스를 테스트 할 수 있고 2) 내가 만든 클래스가 연관된 클래스와 올바르게 협업하는 지 확인할 수 있기 때문이므로 이 두 가지 상황을 연출하기 위해 다음과 같은 클래스에 대한 테스트를 만들어 봄으로써 Mockito의 사용법을 설명해 나가도록 하겠다.
+
+public class WriteArticleServiceImpl {
+    private IdGenerator idGenerator;
+    private ArticleDao articleDao;
+
+    public Article writeArticle(Article article) {
+        Integer id = idGenerator.getNextId();
+        article.setId(id);
+        articleDao.insert(article);
+        return article;
+    }
+   
+    // idGenerator와 articleDao에 대한 setter
+    ...
+}
+
+위 코드에서 WriteArticleServiceImpl 클래스를 테스트 하려면 IdGenerator 인터페이스와 ArticleDao 인터페이스의 구현 객체를 필요로 한다. 하지만, 아직 IdGenerator와 ArticleDao를 구현한 클래스가 완전히 구현되지 않았다. 또한, 테스트 DB의 구축도 완전하지 않은 상황이라고 하자. 따라서 현재로서는 통합 테스트는 진행할 수 없고 WriteArticleServceImpl에 대한 단위 테스트만 진행할 수 있다.
+
+Mockito를 이용한 Mock 객체 생성
+
+WriteArticleServiceImpl 클래스를 테스트하는 코드는 다음과 같을 것이다.
+
+    @Test
+    public void writeArticle() {
+        WriteArticleServiceImpl writeArticleService = new WriteArticleServiceImpl();
+        Article article = new Article();
+        Article writtenArticle = writeArticleService.writeArticle(article);
+       
+        assertNotNull(writtenArticle);
+        assertNotNull(writtenArticle.getId());
+    }
+
+하지만 위 테스트를 실행하면 NullPointerException이 발생하는 데, 그 이유는 WriteArticleServiceImpl.writeArticle() 메서드에서 IdGenerator와 ArticleDao을 구현한 객체를 사용하기 때문이다. 따라서, WriteArticleServiceImpl 클래스를 테스트 하려면 IdGenerator와 ArticleDao를 가짜로 구현한 Mock 객체를 전달해 주어야 한다.
+
+Mockito를 이용할 경우 이는 다음과 같이 Mockito.mock() 이라는 메서드를 이용해서 생성할 수 있다. 아래는 Mock 객체 생성 예이다.
+
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+
+import org.junit.Test;
+
+public class WriteArticleServiceImplTest {
+
+    @Test
+    public void writeArticle() {
+        // mock 객체 생성
+        ArticleDao mockedDao = mock(ArticleDao.class);
+        IdGenerator mockedGenerator = mock(IdGenerator.class);
+       
+        WriteArticleServiceImpl writeArticleService = new WriteArticleServiceImpl();
+        writeArticleService.setArticleDao(mockedDao);
+        writeArticleService.setIdGenerator(mockedGenerator);
+       
+        Article article = new Article();
+        Article writtenArticle = writeArticleService.writeArticle(article);
+       
+        assertNotNull(writtenArticle);
+    }
+}
+
+
+Mock 객체의 메서드 호출 검증하기
+
+Mock 객체를 사용하는 이유는 테스트 하려는 클래스가 연관된 객체와 올바르게 협업하는 지를 테스트 하기 위함도 있다. 따라서, Mock 객체의 메서드가 올바르게 실행되는 지 확인해볼 필요가 있다. Mock 객체의 특정 메서드가 호출되었는 지 확인하려면 Mockito.verify() 메서드와 Mock 객체의 메서드를 함께 사용하면 된다. 아래는 사용 예이다.
+
+    @Test
+    public void writeArticle() {
+        // mock 객체 생성
+        ArticleDao mockedDao = mock(ArticleDao.class);
+        IdGenerator mockedGenerator = mock(IdGenerator.class);
+       
+        WriteArticleServiceImpl writeArticleService = new WriteArticleServiceImpl();
+        writeArticleService.setArticleDao(mockedDao);
+        writeArticleService.setIdGenerator(mockedGenerator);
+       
+        Article article = new Article();
+        Article writtenArticle = writeArticleService.writeArticle(article);
+       
+        assertNotNull(writtenArticle);
+        verify(mockedGenerator).getNextId();
+        verify(mockedDao).insert(article);
+    }
+
+위 코드에서 verify(mockedGenerator).getNextId() 메서드는 mockedGenerator 객체의 getNextId() 메서드가 호출되었는 지의 여부를 확인한다. verify(mockedDao).insert(article) 메서드의 경우 mockedDao 객체의 insert() 메서드 호출 중에서 article 객체를 인자로 전달받는 호출이 있었는 지 여부를 확인한다.
+
+일단 Mock 객체가 만들어지면 해당 Mock 객체는 메서드 호출을 모두 기억하기 때문에, 어떤 메서드 호출이든 검증할 수 있다.
+
+원하는 값을 리턴하는 스텁 만들기
+
+앞서 테스트에서 다음과 같이 writeArticleService.writeArticle(aritlce)이 리턴한 객체가 알맞은 ID 값을 갖는 지 확인하는 검증 코드를 넣었다고 하자.
+
+Article writtenArticle = writeArticleService.writeArticle(article);
+assertNotNull(writtenArticle);
+assertNotNull(writtenArticle.getId()); // 에러 발생
+위 코드에서 assertNotNull(writtenArticle.getId()) 메서드는 검증에 실패한다. 그 이유는 WriteArticleServiceImpl.writeArticle() 메서드가 IdGenerator.nextId() 메서드를 이용해서 ID 값을 가져온 뒤 aritlcle 객체에 저장하기 때문이다. (아래 코드 참조)
+
+
+    public Article writeArticle(Article article) {
+        Integer id = idGenerator.getNextId();
+        article.setId(id);
+        articleDao.insert(article);
+        return article;
+    }
+테스트 코드에서는 IdGenerator로 Mock 객체를 전달했는데, Mockito.mock()을 이용해서 생성한 객체의 메서드는 리턴 타입이 객체인 경우 null을 리턴하고 기본 데이터 타입인 경우 기본 값을 리턴한다. 따라서, 리턴 타입이 Integer인 (즉, 객체인) IdGenerator.getNextId()에 대해서는 null을 리턴하고 따라서 assertNotNull(writtenArticle.getId()) 코드에서 writtenArticle.getId() 메서드가 null을 리턴하게 되어 검증에 실패하는 것이다.
+
+Mockito는 Mock 객체의 메서드가 알맞은 값을 리턴하는 스텁을 만들 수 있는 기능을 제공하고 있다. 이 메서드는 when - then의 형식을 띄고 있는데, 아래 코드는 실제 사용 예를 보여주고 있다.
+
+...
+IdGenerator mockedGenerator = mock(IdGenerator.class);
+when(mockedGenerator.getNextId()).thenReturn(new Integer(1));
+
+WriteArticleServiceImpl writeArticleService = new WriteArticleServiceImpl();
+writeArticleService.setIdGenerator(mockedGenerator);
+
+Article article = new Article();
+Article writtenArticle = writeArticleService.writeArticle(article);
+
+assertNotNull(writtenArticle);
+assertNotNull(writtenArticle.getId());
+verify(mockedGenerator).getNextId();
+Mockito.when() 메서드는 메서드 호출 조건을 그리고 thenReturn()은 그 조건을 충족할 때 리턴할 값을 지정한다. 위 코드의 경우 mockedGenerator.getNextId() 메서드가 호출되면 Integer(1)을 리턴하라는 의미를 갖는다.
+
+Mock 객체의 메서드 호출 시 전달되는 인자 값에 따라서 리턴 값을 다르게 지정할 수도 있다. 아래 코드는 예를 보여주고 있다.
+
+Article article = new Article();
+when(mockedArticleDao.insert(article)).thenReturn(article));
+
+Argument Matcher를 이용한 인자 매칭
+
+보통, when()으로 스텁을 생성하거나 verify()로 메서드 호출 여부를 확인할 때는 특졍한 값을 지정한다.
+
+// 인자 값이 1인 경우 스텁 생성
+when(mockedListService.getArticles(1)).thenReturn(someList);
+// 인자 값으로 1을 전달하여 getArticles() 메서드를 호출했는 지의 여부
+verify(mockedListService).getArticles(1);
+하지만, 특정한 값이 아닌 임의의 값에 대해서 when() 메서드와 verify() 메서드를 실행하고 싶을 때가 있다. 이런 경우에는 Argument Matcher를 이용해서 인자 값을 지정하면 된다. 예를 들어, 임의의 정수 값을 인자로 전달받은 메서드 호출을 when()과 verify()에서 표현하고 싶다면 다음과 같이 Matchers.anyInt() 메서드를 사용하면 된다.
+
+
+when(mockedListService.getArticles(anyInt())).thenReturn(someList);
+...
+verify(mockedListService).getArticles(anyInt());
+Matchers 클래스는 anyInt() 뿐만 아니라 anyString(), anyDouble(), anyLong(), anyList(), anyMap() 등의 메서드를 제공하는데, 이들 메서드에 대한 자세한 내용은 http://mockito.googlecode.com/svn/branches/1.6/javadoc/org/mockito/Matchers.html 사이트를 참고하기 바란다.
+
+인자 중 한가지라도 Argument Matcher를 사용하면 나머지 인자에 대해서도 Matcher를 사용해야 한다. 예를 들어, 아래 코드는 예외를 발생한다.
+
+
+Authenticator authenticator = mock(Authenticator.class);
+when(authenticator.authenticate(anyString(), "password")).thenReturn(authObj);
+만약 여러 인자 중 특정 값을 명시해야 하는 경우가 필요하다면 eq() Matcher를 사용하면 된다. 아래는 위 코드를 eq()를 이용해서 수정한 코드를 보여주고 있다.
+
+Authenticator authenticator = mock(Authenticator.class);
+when(authenticator.authenticate(anyString(), eq("password"))).thenReturn(authObj);
+Mockito 클래스는 Matchers 클래스를 상속받고 있기 때문에 Mockito 클래스의 static 메서드를 static import 하면 Matchers 클래스에 정의된 메서드를 사용할 수 있다.
+
+thenThrow()를 이용한 예외 발생
+
+Mock 객체의 메서드 호출시 예외를 발생시키고 싶을 때가 있는데, 이런 경우에는 thenThrow() 메서드를 사용하면 된다. 아래는 사용 예를 보여주고 있다.
+
+when(mockedDao.insert(article)).thenThrow(new RuntimeException("invalid title"));
+thenThrow() 메서드에서 발생시킬 예외 객체를 전달해주면, when()에서 지정한 조건의 메서드가 호출될 때 예외를 발생시킨다.
+
+메서드 호출 회수 검사
+
+메서드가 지정한 회수 만큼 호출되었는 지의 여부를 확인하려면 times() 메서드를 사용하면 된다. 예를 들어, Mock 객체의 특정 메서드가 3번 호출되었는 지 확인하려면 다음과 같이 verify() 메서드의 두 번째 인자에 times() 메서드를 (정확히는 times() 메서드의 리턴 값을) 전달해주면 된다.
+
+verify(mockedAuthenticator, times(3)).authenticate(anyString(), anyString());
+호출 회수를 따로 지정하지 않을 경우 times(1)이 기본 값이 된다. times() 외에 다음과 같은 메서드를 사용할 수 있다.
+times(int) - 지정한 회수 만큼 호출되었는 지 검증
+never() - 호출되지 않았는지 여부 검증
+atLeastOnce() - 최소한 한번은 호출되었는 지 검증
+atLeast(int) - 최소한 지정한 회수 만큼 호출되었는 지 검증
+atMost(int) - 최대 지정한 회수 만큼 호출되었는 지 검증
+다수의 Mock 객체들이 사용되지 않은 것을 검증하고 싶은 경우에는 verifyZeroInteractions(Object ... mocks) 메서드를 사용하면 된다. 아래는 사용 예이다.
+
+
+verifyZeroInteractions(mockedOne, mockedTwo, mockedThree);
+
+Answer를 이용한 메서드 구현
+
+Mock 객체를 사용하다보면 직접 Mock의 동작 방식을 구현해 주고 싶을 때가 있다. (사실, 필자가 개인적으로 굳이 간단한 Mock 라이브러릴 만든 이유도 이것 때문이었다.) 이런 경우 thenAnswer() 메서드와 Answer 인터페이스를 사용하면 된다. 아래 코드는 사용 예이다.
+
+when(mockedGenerator.getNextId()).thenAnswer(new Answer<Integer>() {
+    private int nextId = 0;
+    public Integer answer(InvocationOnMock invocation) throws Throwable {
+        return new Integer(++nextId);
+    }
+});
+위와 같이 Answer를 사용하면, mockedGenerator의 getNextId() 메서드를 호출할 때 마다 answer() 메서드가 호출된다. 위 코드의 경우 getnextId() 메서드가 호출될 때 마다 1씩 증가된 값을 리턴하는 Anwser 구현  클래스를 리턴하였다.
+
+만약 파라미터로 전달되는 값을 사용하고 싶다면 answer() 메서드에 전달된 InvocationOnMock을 이용하면 된다. 아래 코드는 사용 예이다.
+
+when(authenticator.authenticate(anyString(), anyString())).thenAnswer(new Answer<Object> (){
+    public Object answer(InvocationOnMock invocation) throws Throwable {
+        Object[] arguments = invocation.getArguments();
+        String userId = (String) arguments[0];
+        String password = (String) arguments[1];
+        Object authObject = null;
+        // ...
+        return authObject;
+    }
+});
+
+@Mock 어노테이션을 이용한 코드 단순화
+
+Mockito.mock() 메서드를 이용해서 Mock 객체를 생성하는 코드가 다소 성가시게 느껴진다면, @Mock 어노테이션을 이용해서 Mock 객체를 생성할 수 있다. 예를 들어, 아래 코드와 같이 테스트 클래스의 멤버 필드에 @Mock 어노테이션을 적용하면 해당 타입에 대한 Mock 객체가 할당된다.
+
+@Mock 어노테이션이 동작하려면 테스트가 실행되기 전에 @Mock 어노테이션이 적용된 필드에 Mock 객체를 할당하도록 해 주어야 한다. JUnit 4 버전의 경우 @RunWith 어노테이션에서 MockitoJUnit44Runner.class를 값으로 지정해주면 된다.
+
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+
+@RunWith(MockitoJUnit44Runner.class)
+public class WriteArticleServiceImplTest {
+
+    @Mock Authenticator authenticator;
+    @Mock ArticleDao mockedDao;
+    @Mock IdGenerator mockedGenerator;
+   
+    @Test
+    public void setup() {
+        when(authenticator.authenticate(anyString(), eq("password"))).thenReturn(null);
+        ...
+    }
+
+}
+또는 테스트가 실행되기 전에 명시적으로 MockitoAnnotations.initMocks(this) 메서드를 호출해주면 된다.
+
+public class WriteArticleServiceImplTest {
+
+    @Mock Authenticator authenticator;
+    @Mock ArticleDao mockedDao;
+    @Mock IdGenerator mockedGenerator;
+   
+    @Before
+    public void test() {
+        MockitoAnnotations.initMocks(this);
+    }
+   
+    @Test
+    public void writeArticle() {
+        when(authenticator.authenticate(anyString(), eq("password"))).thenReturn(null);
 
 
 
