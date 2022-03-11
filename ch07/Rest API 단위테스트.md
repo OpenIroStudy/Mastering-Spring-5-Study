@@ -408,7 +408,7 @@ public class WriteArticleServiceImplTest {
 
 
 
-
+https://javacan.tistory.com/entry/MocktestUsingMockito
 
 
 #### 단위 테스트는 단순한 디자인의 4가지 원칙을 지켜야 한다. 
