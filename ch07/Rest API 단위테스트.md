@@ -145,6 +145,16 @@ Answers.RETURNS_DEFAULTS 은 stub 되지 않은 메소드들에 대해서는 Moc
 * NONE : 웹 컨텍스트 없이 스프링 컨텍스트를 로드한다. 
 
 
+https://javacan.tistory.com/entry/MocktestUsingMockito 
+
+
+
+
+
+
+
+
+
 
 #### 단위 테스트는 단순한 디자인의 4가지 원칙을 지켜야 한다. 
 
