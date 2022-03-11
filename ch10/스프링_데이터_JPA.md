@@ -39,7 +39,8 @@ private static String dbpasswd = "connect123!@#";
 일반적인 JDBC 코드에는 실행할 쿼리, 명령문의 오브젝트에 쿼리 매개변수를 설정하는 코드 (EX. setString), ResultSet을 bean에 옮기는 코드 
 <br><br>
 
-<H1>가장 많이 쓰인 레이어 </H1>
+<H1>가장 많이 쓰인 레이어 </H1> 
+
 * 마이바티스 : 마이바티스는 매개변수를 설정하고 결과를 검색하기 위해 코드를 수동으로 작성할 필요가 없다. 자바 POJO를 데이터베이스에 매핑하는 간단한 XML이나 어노테이션 기반으로 구성을 제공한다. 
 * 하이버네이트 : 하이버네이트는 ORM 프레임워크다. ORM 프레임워크는 오브젝트를 관계형 데이터베이스의 테이블에 매핑하는 데 유용하다. 하이버네이트의 가장 큰 장점은 개발자가 직접 쿼리를 작성할 필요가 없다는 것이다. 객체와 테이블 간의 관계가 매핑되면 하이버네이트는 매핑을 사용해 쿼리를 생성하고 데이터를 채우거나 검색한다. 
 
@@ -99,3 +100,26 @@ class MemberEntity {
 
 
 
+```java
+RunWith(SpringRunner.class)
+@DataJpaTest
+@ActiveProfiles("...")
+@AutoConfigureTestDatabase(replace = 
+@AutoConfigureTestDatabase.Replace.NONE)
+public class JpaTest {
+
+}
+```
+* @DataJpaTest : jpa 레파지토리 단위 테스트에서 SpringRunner와 함께 사용된다. JPA 관련 자동 설정만 활성화한다. 테스트는 기본적으로 인메모리 데이터베이스를 사용한다. 
+* @RunWith(SpringRunner.class) : SpringRunner는 SpringJUnit4ClassRunner의 간단한 별칭이다. 스프링 컨텍스트를 시작한다.
+* @Autowired : 테스트에 사용될 class를 오토와이어링한다.
+
+
+#### Optional은 null일 수도 있는 객체의 컨테이너 객체를 나타낸다.
+ * Optional의 중요한 메소드
+  * isPresent() : Optional에 null이 아닌 값이 포함돼 있는지 확인한다.
+  * orElse() : 포함된 객체가 null인 경우의 기본값이다.
+  * ifPresent() : 포함된 객체가 null이 아닌 경우 ifPresent의 코드가 실행된다.
+  * get() : 포함된 객체를 검색한다. 
+  
+  
