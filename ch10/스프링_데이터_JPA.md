@@ -70,7 +70,7 @@ CrudRepository 인터페이스는 기본 CRUD 메소드를 제공한다. PagingA
 
 * @Entity : 해당 클래스가 엔티티음을 지정하는 어노테이션이다.
 * @Id : ID가 엔티티의 기본 키임을 지정한다.
-* @GeneratedValue(strategy = GenerationType.AUTO) : GeneratedValue 어노테이션은 기본 키 생성 방법을 지정하는 데 사용된다.
+* @GeneratedValue(strategy = GenerationType.AUTO) : GeneratedValue 어노테이션은 기본 키 생성 방법을 지정하는 데 사용된다. -> autoIncrement
 * @ManyToOne(fetch = FetchType.LAZY)는 User와 Todo 사이의 다대일 관계를 나타낸다. 관계의 한쪽에서 @ManyToOne 관계가 사용된다.
 * @JoinColumn : 외래 키 열의 이름을 지정한다.
 
@@ -123,3 +123,165 @@ public class JpaTest {
   * get() : 포함된 객체를 검색한다. 
   
   
+
+
+
+```java
+@Autowired
+TestEntityManager entityManager;
+
+@Test
+public void save() {
+ Todo todo = todoRepository.findById(101L);
+ todo.setDescription("Todo Desc Updated");
+ todoRepository.save(todo);
+ 
+ entityManager.flush();
+ 
+ Todo updatedTodo = todoRepository,findById(101L).get();
+ 
+ assertEquals("Todo Desc Updated", updatedTodo.getDescription());
+```
+
+
+PagingAndSortingRepository
+정렬과 페이징을 도우는 Repository이다.
+
+```java
+@DataJpaTest
+@Runwith(SpringRunner.class)
+public class UserRepository.class {
+ @Autowired
+ UserRepository userRepository;
+ 
+ @Autowired
+ TestEntityManager entityManager;
+ }
+ 
+ @Test
+ public void testing() {
+  Sort sort = new Sort(Sort.Description.DESC, "name")
+                   .and(new Sort(Sort.Direction.ASC, "userid"));
+  Iterator<User> users = userRepository.findAll(sort);
+  }
+  ```
+  
+  * new Sort(Sort.Description.DESC - name을 내림차순으로 정렬한다.
+  * and(new Sort(Sort.Direction.ASC - and() 메소드는 서로 다른 메서드는 서로 다른 정렬 구성을 결합하는 연결 메소드다. 
+  * userRepository(sort) : 정렬 기준은 findAll 메서드에 매개변수로 전달된다.
+
+
+```java
+
+@Test
+public void paging() {
+ PageRequest pageable = new PageRequest(0,2);
+ Page<User> userPage = userRepository.findAll(pageable);
+
+}
+```
+* new PageRequest(0,2)첫번째 페이지를 요청하고 2개씩 보내준다.
+* userRepository.findAll(pageable) findAll 메소드에 pageable을 전달해준닫.
+
+#### pageRequest의 주의사항
+- PageRequest 객체에는 페이지를 탐색하는 next(), previous(), first() 메소드가 있다. <br>
+- pageRequest 생성자(public PageRequest(int page, int size, Sort sort)) 이다.
+
+#### 반환 타입에 따른 페이징 결과
+Spring Data JPA 에는 반환 타입에 따라서 각기 다른 결과를 제공한다. <br>
+
+ 
+
+* Page<T> 타입
+* Slice<T> 타입
+* List<T> 타입
+각자 다른 결과를 반환해준다.
+
+* Page<T> 타입 : Page<T> 타입을 반환 타입으로 받게 된다면 offset과 totalPage 를 이용하여 서비스를 제공할 수 있게된다.
+* Page<T> 는 일반적인 게시판 형태의 페이징에서 사용된다.
+ 
+ ![image](https://user-images.githubusercontent.com/43237961/158751445-c23c9558-45fe-45a4-8268-22db761a8fa5.png)
+<br> 
+* 여기서 중요한 정보는 총 페이지 수 이다. 그 정보를 포함하여 반환한다.
+* Page<T> 타입은 count 쿼리를 포함하는 페이징으로 카운트 쿼리가 자동으로 생성되어 함께 나간다.
+ ```java
+ {
+  "content": [
+    { "id": 13, "username": "User 12", "address": "Korea", "age": 12 },
+    { "id": 14, "username": "User 13", "address": "Korea", "age": 13 },
+    { "id": 15, "username": "User 14", "address": "Korea", "age": 14 },
+    { "id": 16, "username": "User 15", "address": "Korea", "age": 15 }
+  ],
+  "pageable": {
+    "sort": { "sorted": false, "unsorted": true, "empty": true },
+    "pageNumber": 3,
+    "pageSize": 4,
+    "offset": 12,
+    "paged": true,
+    "unpaged": false
+  },
+  "totalPages": 25,
+  "totalElements": 100,
+  "last": false,
+  "numberOfElements": 4,
+  "number": 3,
+  "sort": { "sorted": false, "unsorted": true, "empty": true },
+  "size": 4,
+  "first": false,
+  "empty": false
+}
+ ```
+ 
+* Slice<T> 타입 : Slice<T> 타입을 반환 타입으로 받게 된다면 더보기 형태의 페이징에서 사용된다. 
+![image](https://user-images.githubusercontent.com/43237961/158751617-83534d3f-7031-4cca-b6d5-c829791d57e8.png)
+
+ <br> 
+ 
+ ```java
+{
+  "content": [
+    { "id": 13, "username": "User 12", "address": "Korea", "age": 12 },
+    { "id": 14, "username": "User 13", "address": "Korea", "age": 13 },
+    { "id": 15, "username": "User 14", "address": "Korea", "age": 14 },
+    { "id": 16, "username": "User 15", "address": "Korea", "age": 15 }
+  ],
+  "pageable": {
+    "sort": { "sorted": false, "unsorted": true, "empty": true },
+    "pageNumber": 3,
+    "pageSize": 4,
+    "offset": 12,
+    "paged": true,
+    "unpaged": false
+  },
+  "number": 3,
+  "numberOfElements": 4,
+  "first": false,
+  "last": false,
+  "size": 4,
+  "sort": { "sorted": false, "unsorted": true, "empty": true },
+  "empty": false
+}
+ ```
+ 
+ Page<T> 타입의 반환에 없는 것들이 존재한다. number과 numberOfElements 그리고 Page<T> 에 존재하던 totalPages, totalElements 가 없어졌다.
+<br> 
+Slice<T> 타입은 추가 count 쿼리 없이 다음 페이지 확인 가능하다. 내부적으로 limit + 1 조회를 해서 totalCount 쿼리가 나가지 않아서 성능상 조금 이점을 볼 수도 있다.
+ 
+ <br><br>
+ 
+ 
+ #### 커스텀 JPQL 쿼리 작성하기
+ ```java
+ @Query("select u from User u where u.name = ?1")
+ List<User> findUsersByNameUsingQuery(String name);
+
+ @Query("select u from User u where u.name = :name")
+ List<User> findUsersByNameUsingQuery(@Param("name") String name);
+ 
+ ```
+ 
+ * @Query : 레파지토리 메소드의 쿼리를 정의하는 어노테이션이다. 
+ * name 매개변수는 인스 리스트에서 명명된 매개변수를 정의한다. 
+ 
+ ##### 네이티브 SQL 쿼리
+ 
