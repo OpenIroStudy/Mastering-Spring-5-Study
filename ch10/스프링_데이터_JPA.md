@@ -233,6 +233,7 @@ Spring Data JPA 에는 반환 타입에 따라서 각기 다른 결과를 제공
  ```
  
 * Slice<T> 타입 : Slice<T> 타입을 반환 타입으로 받게 된다면 더보기 형태의 페이징에서 사용된다. 
+ 
 ![image](https://user-images.githubusercontent.com/43237961/158751617-83534d3f-7031-4cca-b6d5-c829791d57e8.png)
 
  <br> 
@@ -284,4 +285,137 @@ Slice<T> 타입은 추가 count 쿼리 없이 다음 페이지 확인 가능하�
  * name 매개변수는 인스 리스트에서 명명된 매개변수를 정의한다. 
  
  ##### 네이티브 SQL 쿼리
+ 
+* 네이티브 쿼리란 - JPQL은 표준 SQL이 지원하는 대부분의 문법과 SQL함수를 지원한다.근데 특정 DB의 방언과 같은 종속적 기능은 지원하지 않는다.
+* 네이티브 SQL을 사용하면 엔티티를 조회할 수 있고, JPA가 지원하는 영속성 컨텍스트의 기능을 그대로 사용할 수 있다.
+
+ - 네이티브 쿼리 API는 3가지가 있다.
+
+* 결과 타입을 정의
+* 결과 타입을 정의할수 없을 때
+* 결과 매핑 사용
+ 
+ ```java
+  @Test
+    @DisplayName("네이티브 SQL 엔티티 조회")
+    void nativeQueryTest() {
+        String sql = "select id, name, price from item where price > ?";
+        Query nativeQuery = em.createNativeQuery(sql, Item.class).setParameter(1, 100);
+
+        List<Item> items = nativeQuery.getResultList();
+    }
+ ```
+ 
+* jdbc 사용할때와 똑같은 느낌이 든다.
+* 근데 가장 중요한점은
+* SQL만 직접 사용할 뿐, JPQL을 사용할 때와 같다. 조회한 엔티티도 영속성 컨텍스트에서 관리 된다.
+ 
+* 값 조회
+  * 값으로 조회하려면 엔티티 조회처럼 class를 같이 넣어주는게 아니라
+  * em.createNativeQuery(sql) 를 사용하면 된다.
+  * 대신 이때 nativeQuery.getResultList() 는 Object 배열을 반환하므로
+  * List<Object[]> 로 반환을 받아야한다.
+  * 더욱 더 JDBC같이 생겼다.
+ 
+ 
+* 결과 매핑 사용
+  * 결과 매핑을 사용하면 엔티티 자체에 너무 많은 어노테이션 설정을 해야되므로 보편적으로 사용하지 않을 것 같다는 나의 생각이 들어있다.
+  * 그래도 정리를 해보도록 하겠다.
+```java
+String sql = "select M.ID, AGE, NAME, TEAM_ID, I.ORDER_COUNT FROM MEMBER M " +
+"LEFT JOIN (SELECT IM.ID, COUNT(*) AS ORDER_COUNT FROM ORDERS O, MEMBER IM " +
+"WHERE O.MEMBER_ID = IM.ID) I ON M.ID = I.ID";
+
+Query nativeQuery = em.createNativeQuery(sql, "memberWithOrderCount");
+List<Object[]> members = nativeQuery.getResultList();
+```
+ 아래는 매핑 정의 코드이다.
+```java
+@Entity
+@SqlResultSetMapping(name = "memberWithOrderCount",
+    entities = {@EntityResult(entityClass = Member.class) },
+    columns = {@ColumnResult(name = "ORDER_COUNT")}
+}
+ ```
+- public class Member {...}
+- id, age, name, team_id 는 Member 엔티티로 매핑을 시키고 order_count 는 단순 칼럼으로 매핑했다.
+- 이렇게 여러 컬럼들을 매핑해서 추출할 수 있다.
+ 
+ 
+ 
+ #### 참고로 nativeQuery는 entityManager에서도 jpaRepository에서도 전부 사용 가능.
+ 
+ 
+ * @Transactional
+ 
+ 
+ 1. @Transactional 은 public 메소드에서만 정상 작동한다.
+
+
+2. @Transactional 을 달아놓은 메소드가 동일한 클래스 내의 다른 메소드에 의해 호출된다면 트랜잭션이 정상 작동하지 않는다.
+
+ ```
+ex: 퍼사드 패턴이나 템플릿 패턴처럼 여러 메소드를 내부적으로 묶어 사용하고 있는 메소드가 있다면 구성요소 메소드에 @Transactional 를 달지 않고 구성요소를 묶고 있는 상위개념의 메소드에 @Transactional 을 달아주어야 한다. 구성요소 메소드에 @Transactional 을 달아 주어 트랜잭션으로 관리 할 경우 rollback 이 정상적으로 작동하지 않는 경우가 발생한다.
+
+ ```
+ 
+- propagation 속성이 required 인 경우, 트랜잭션안에서 호출되는 메소드가 트랜잭션으로 같이 묶이게 되어 예상치 못한 결과가 나올 수 있다는 내용이다.
+
+- required propagation 속성은 트랜잭션이 이미 존재하면 append를 하고, 트랜잭션이 존재하지 않다면 새로 생성한다. (공식 doc)
+
+ 
+
+3. Spring Transaction 은 기본적으로 unchecked Exception (RuntimeException) 만 관리하며 checked Exception (IOException, SQLException 등) 은 관리하지 않는다.
+
+ ```
+ 
+처리방법 1: @Transactional(rollbackFor=Exception.class) 와 같이 설정하여 모든 Exception 발생시 rollback 이 발생하게 처리하거나(unchecked Exception, checked Exception 모두 Exception.class 밑에 있다.)
+
+처리방법 2: checked Exception 이 발생할 가능성이 있는 부분을 try ~ catch (SQLException se){throw new RuntimeException(); } 과 같이 처리(checked Exception 발생시 unchecked Exception 으로 예외를 바꾸어 던지게 처리)하여 Transaction의 관리대상으로 묶어버릴 수 있다.
+
+ ```
+ 
+ 
+
+4. pointcut 을 사용한 Transaction 설정과 어노테이션을 사용한 Transaction 설정을 동시에 사용하게 될 경우, 어노테이션이 우선적용(precedence)되는 것 같다. (https://stackoverflow.com/questions/32057910/custom-spring-aop-around-transactional/33509777#33509777)
+
+ 
+ 
+ 
+ 
+ 2. Isolation 
+
+SQL 의 Isolation level 과 동일하게 동작 (SQL 격리수준 속성에 대한 자세한 내용은 이곳을 참고)
+
+- READ_UNCOMMITED : commit 되지 않은 데이터를 읽는다
+
+- READ_COMMITED : commit 된 데이터만 읽는다
+
+- REPEATABLE_READ : 자신의 트랜잭션이 생성되기 이전의 트랜잭션(낮은 번호의 트랜잭션)의 커밋된 데이터만 읽는다 
+
+- SERIALIZABLE : LOCK 을 걸고 사용
+
+- DEFAULT : 사용하는 DB 기본 설정을 따른다. (Oracle 은 READ_COMMITED, Mysql InnoDB 는 REPEATABLE_READ 가 Default)
+
+ 
+
+ 
+
+3. Propagation
+
+- REQUIRE : 부모 트랜잭션(자신을 호출한 메소드의 Transaction)이 존재한다면 그에 포함되어 동작. 부모 트랜잭션이 존재하지 않을 경우 새로 트랜잭션 생성(default 속성)
+
+- SUPPORTS : 부모 트랜잭션이 존재하면 그에 포함되어 동작. 부모 트랜잭션이 없다면 트랜잭션 없이 동작.
+
+- MANDATORY : 부모 트랜잭션이 존재하면 그에 포함되어 동작. 부모 트랜잭션이 없다면 예외 발생시킨다.
+
+- REQUIRES_NEW : 부모 트랜잭션 존재 여부와 상관없이 트랜잭션을 새로 생성
+
+- NOT_SUPPORTED : 트랜잭션을 사용하지 않는다. 부모 트랜잭션이 존재하면 보류시킨다.
+
+- NEVER : 트랜잭션을 사용하지 않도록 강제한다. 부모 트랜잭션이 존재할 경우 예외를 발생시킨다.
+
+- NESTED : 부모 트랜잭션이 존재하면 부모 트랜잭션 안에 트랜잭션을 만든다. 부모트랜잭션의 커밋과 롤백에 영향을 받지만 자신의 커밋과 롤백은 부모 트랜잭션에 영향을 주지 않는다.
+
+ 
  
